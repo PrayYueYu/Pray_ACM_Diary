@@ -59,3 +59,15 @@
 |             |                                                |                                                       |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
+
+> [!TIP]
+
+> [!WARNING]
+
+> [!NOTE]
+
+> [!IMPORTANT]
+
+> [!CAUTION]
+
+> 
