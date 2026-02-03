@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 #define int long long
 const int N = 2e6 + 10, mod = 1e9 + 7, INF = 1e18; 
-int n, a[N];
+int a[N], n;
 int read() {
 	int x = 0, f = 1;
 	char ch = getchar();
@@ -16,17 +16,16 @@ int read() {
 	return x * f;
 }
 void solve() {
-	n = read();
-	int maxn = -INF;
+	n = read(); n++;
+	a[n] = read();
+	int ans = -INF;
+	for(int i = 1; i < n; i++) a[i] = read();
 	for(int i = 1; i <= n; i++) {
-		a[i] = read();
-		maxn = std::max(maxn, a[i]);
+		int ne = i + 1;
+		if(ne > n) ne = 1;
+		 ans = std::max(ans, a[i] + a[ne]);
 	}
-	if(n == 1) {
-		std::cout << a[1] << '\n';
-		return;
-	}
-	std::cout << maxn * (n - 2) + a[1] + a[n] << '\n';
+	std::cout << ans << '\n';
 }
 signed main() {
 	int T = read();
