@@ -536,29 +536,50 @@ sum[i][j][k] = sum[i - 1][j][k] + sum[i][j - 1][k] + sum[i][j][k - 1] - sum[i - 
 
 ### 13.1 随机数据生成
 
+简单写法(对于 $int$ 内的数据生成有效)：
+
+```c++
+#include<bits/stdc++.h>
+long long RandLL(long long L, long long R) {
+    return (rand() * rand()) % (R - L + 1) + L;
+}
+int main() {
+    srand(time(0));//注意，srand只能放全局！！
+    std::cout << RandLL(-100, 23333);
+}
+```
+
+
+
 $long\ long$类型：
 
 ```c++
 #include<bits/stdc++.h>
+#define ll long long
+std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 ll RandLL(ll L, ll R) {
-    static std::mt19937_64 rng(std::random_device{}());
-    std::uniform_int_distribution<ll> dist(L, R);
-    return dist(rng);
+    return std::uniform_int_distribution<ll>(L, R)(rng);
 }
 int main() {
-    cout << RandLL(-100, 33333333333333);
+    std::cout << RandLL(-100, 33333333333333);
     return 0;
 }
 ```
 
-$double$类型：
+$double$​类型：
+
+**注意，$double$类型范围是$[L,R)$**
 
 ```c++
 #include<bits/stdc++.h>
-double RandDouble(double L, double R) {   // [L, R] 闭区间
-    static std::mt19937_64 gen(std::random_device{}());        // 只播种一次
-    std::uniform_real_distribution<double> dist(L, R);         // 浮点分布
-    return dist(gen);
+double RandDouble(double L, double R) {
+   static std::mt19937_64 rng([]{
+       auto seed = chrono::steady_clock::now().time_since_epoch().count();
+       std::random_device rd;
+       seed ^= rd() + 0x9e3779b97f4a7c15ULL + (seed<<6) + (seed>>2);
+       return seed;
+   }());
+   return uniform_real_distribution<double>(L, R)(rng);
 }
 int main() {
     cout << RandDouble(-12.3, 9.1);
