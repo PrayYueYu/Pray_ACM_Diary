@@ -963,6 +963,7 @@ b3 = b1 >> 1;
 cout << b3.count() << endl;//1出现的数量
 b1.reset();//清空(置零)
 
+b1.set(x);//把第x位变成1
 b1.test(x);//检查第x位是否为1，O(1)
 b1.flip(x);//重要！相当于b1^(1<<x)，或者翻转某一位，O(1)
 
@@ -2569,6 +2570,8 @@ $2 \& 3$特性表示：
 
 最后反推回去一定能使得满足上述构造条件：异或和的集合相同，能相互构造出来
 
+#### 简单版本
+
 ```c++
 void insert(int x) {
 	for(int i = 63; i >= 0; i--) {
@@ -2589,6 +2592,56 @@ int main() {
     }
 }
 ```
+
+
+
+#### 记录每个线性基来自于原数组哪几个$a_i$异或而来的版本
+
+```c++
+bitset<N> bs[70];//bs[i][j]=1代表线性基i是由a[j1]^a[j2]^...^a[jx]异或而来
+void insert(int x, int id) {
+	int mask = 0;
+	for(int i = 63; i >= 0; i--) {
+		int f = (x >> i) & 1;
+		if(!f) continue;
+		if(!p[i]) {
+			p[i] = x;
+			from[i] = mask;
+			//from[i]: 记录基向量 i是由哪些基向量异或而来 
+			//用的二进制保存 
+			bs[i].set(id);
+			//bs[i]: 记录用了原数组中哪些a[i]异或而成
+			//当前只记录a[id]，后续再GetSource()
+			//不然时间复杂度很大 
+			return;
+		}
+		x = x ^ p[i];
+		mask |= (1ll << i);
+	}
+}
+void GetSource() {
+	for(int i = 62; i >= 0; i--) {
+		for(int j = i + 1; j <= 63; j++) {
+			if((from[i] >> j) & 1) {
+				bs[i] ^= bs[j];
+			}
+		}
+	}
+}
+signed main() {
+	n = read();
+	for(int i = 1; i <= n; i++) {
+		a[i] = read();
+		insert(a[i], i);
+	}
+	GetSource();
+	return 0;
+}
+```
+
+时间复杂度：$O(N logW)$，常数会比较大
+
+
 
 ### 2.2 线性基合并
 
@@ -2624,7 +2677,27 @@ merge(p, p1, p2);
 
 #### 2.3.-1 查找是否能$XOR=k$
 
-只需要判断$k$的每一位为$1$的是否有线性基即可
+> [!IMPORTANT]
+>
+> **最重要的功能！！！**
+>
+> 若未进行高斯消元，那么**必须从高位到低位进行判断**，每次都需要重新XOR再进行下一步
+
+```c++
+k = read();
+for(int i = 63; i >= 0; i--) {
+    if((k >> i) & 1) {
+        if(!p[i]) {
+            std::cout << -1 << '\n';
+            return;
+        }
+        ans.push_back(i);//答案
+        k ^= p[i];//重要！！因为没有进行高斯消元，所有都是乱的，只能保证第i个线性基最高位是(1ll<<i)
+    }
+}
+```
+
+
 
 #### 2.3.0 高斯消元
 
