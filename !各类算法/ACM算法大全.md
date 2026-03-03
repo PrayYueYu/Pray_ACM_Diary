@@ -937,7 +937,28 @@ $n$为质数（或者$n=1或4$）
 
 可以得到$a_x\equiv x\cdot (\Pi_{i=1}^{x-1}a_i)^{-1}(mod\ n)$
 
-可以验证发现$a_i$恰为一个排列
+可以验证发现$a_i$​恰为一个排列
+
+## 8. 向上取整
+
+**注意，除数和被除数异号的时候直接除就行了**
+
+```c++
+int calc_up(int x, int y) {
+	if(x % y == 0) return x / y;
+	if((x <= 0 && y < 0) || (x >= 0 && y > 0))
+		return x / y + 1;
+	return x / y;
+}
+```
+
+
+
+
+
+
+
+
 
 # 三. $STL$
 
@@ -3004,8 +3025,6 @@ for(int i = 2; i <= N0; i++) {
 
 ## 5. 欧拉函数&欧拉降幂
 
-
-
 ### 5.1 欧拉函数
 
 欧拉函数$\varphi (n)$为$[1,n-1]$中与$n$互质的数的个数
@@ -4847,6 +4866,69 @@ signed main(){
 
 1. 表示三角形面积
 2. 若$p>0$，代表$\vec{a}$通过顺时针旋转$(0,\pi)$的角度到$\vec{b}$;      $p=0$，$\vec{a},\vec{b}$​共线;       $p<0$，$\vec{a}$通过逆时针旋转$(0,\pi)$的角度到$\vec{b}$​
+
+
+
+## 21. 扩展欧几里得 $Exgcd$
+
+这里直接讲$a·x+b·y=d$（假设$a,\ b,\ d$都是正整数）​
+
+> [!IMPORTANT]
+>
+> 如果$b \% \gcd(a, x)\ne 0$那么这组方程无解
+
+$exgcd$求的是$a·x+b·y=\gcd(a,b)$的一组解
+
+### 21.1 基本代码
+
+```c++
+int Exgcd(int a, int b, int &x, int &y) {
+	if (!b) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+  	int d = Exgcd(b, a % b, x, y);
+  	int t = x;
+  	x = y;
+  	y = t - (a / b) * y;
+  	return d;
+}
+void solve(int a, int b, int d) {
+    int x, y;
+    int g = Exgcd(a, b, x, y);//返回值是gcd，x和y自动赋值
+    if(d % g != 0) return false;//无解
+    x = x * (d / g); y = y * (d / g);//此时(x, y)即为一组解
+}
+```
+
+## 21.2 通解
+
+得到一组解$(x_0,\ y_0)$​之后，可以得到通解：
+
+$\begin{cases}
+x = x_0 + t · \frac{b}{g} \\ \\
+y = y_0 - t · \frac{a}{g}
+\end{cases}$​​
+
+### 21.3 最小非负整数解
+
+以$x$为例，写出不等式可以有：$x_0+t·\frac{b}{g} >= 0$
+
+于是有$t >= -x_0/(\frac{b}{g})$
+
+这里可以用到向上取整得到最小的$t$​
+
+```c++
+int calc_up(int x, int y) {
+	if(x % y == 0) return x / y;
+	if((x <= 0 && y < 0) || (x >= 0 && y > 0)) //异号时需特判
+		return x / y + 1;
+	return x / y;
+}
+```
+
+
 
 
 

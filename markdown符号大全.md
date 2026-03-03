@@ -47,10 +47,10 @@
 | 向量箭头    | $\vec{x}$                                      | 表示(\vec{x})                                         |
 | 下三角      | $\vee$                                         | 表示(\vee)                                            |
 | 同余        | $\equiv$                                       | 表示(\equiv)                                          |
-| 向下取整    | $\lfloor \rfloor$                              | 表示(\lfloor \rfloor)                                 |
-| 向上取整    | $\lceil \rceil$                                | 表示(\lceil \rceil)                                   |
-| 删除线      | ~~删除~~                                       | 表示(~~ ~~)                                           |
-|             |                                                |                                                       |
+| 向下取整    | $\lfloor \rfloor$                              | ``\lfloor \rfloor``                                   |
+| 向上取整    | $\lceil \rceil$                                | `\lceil \rceil`                                       |
+| 删除线      | ~~删除~~                                       | `~~xx~~`                                              |
+| 大括号      | $$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$ | `$$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$`      |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
@@ -60,14 +60,20 @@
 |             |                                                |                                                       |
 |             |                                                |                                                       |
 
-> [!TIP]
 
-> [!WARNING]
 
-> [!NOTE]
 
-> [!IMPORTANT]
 
-> [!CAUTION]
+**注意：**双`$$`是居中显示的代码块，单`$`是靠左显示的代码块
+
+> > > >  [!TIP]
+
+> > > >  [!WARNING]
+
+> > > >  [!NOTE]
+
+> >  [!IMPORTANT]
+
+> >  [!CAUTION]
 
 > 
