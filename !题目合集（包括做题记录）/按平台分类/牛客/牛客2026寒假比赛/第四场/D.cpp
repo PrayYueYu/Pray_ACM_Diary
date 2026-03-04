@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
-#define int long long
+//#define int long long
+#define int __int128
 const int N = 2e6 + 10, mod = 998244353, INF = 9e18;
 
 int read() {
@@ -26,7 +27,7 @@ int Exgcd(int a, int b, int &x, int &y) {
 	x = y;
 	y = t - (a / b) * y;
 	return d;
-}
+}  
 int calc_up(int x, int y) {
 	if(x % y == 0) return x / y;
 	if((x <= 0 && y < 0) || (x >= 0 && y > 0)) 
@@ -39,6 +40,15 @@ int calc_down(int x, int y) {
 		return x / y;
 	return x / y - 1;
 }
+void Print(__int128 x) {
+    if (x < 0) {
+        putchar('-');
+        Print(-x);
+        return;
+    }
+    if (x >= 10) Print(x / 10);
+    putchar(x % 10 + '0');
+}
 void solve() {
 	int L = read(), a = read(), b = read();
 	int x, y; int g = Exgcd(a, b, x, y);
@@ -46,14 +56,7 @@ void solve() {
 		std::cout << "No\n";
 		return;
 	}
-	if(x < 0 && y < 0) {
-		std::cout << "No\n";
-		return;
-	}	
-	x *= (L / g); y *= (L / g);
-	int tx;
-	if(a > b) tx = calc_down(y, a / g);
-	else tx = calc_up(-x, b / g);
+	x = x * (L / g); y = y * (L / g);
 	int X = calc_up(-x, b / g), Y = calc_down(y, a / g); 
 	if(X > Y) {
 		std::cout << "No\n";
@@ -61,10 +64,9 @@ void solve() {
 	}
 	int k = (b + a) / g;
 	int m = x - y;
-	//|x-y|=|kt+m| 
 	int t = calc_up(-m, k);
 	int minn = INF, ansc1 = 0, ansc2 = 0;
-	for(int i = t - 50; i <= t + 50; i++) {
+	for(int i = t - 10; i <= t + 10; i++) {
 		int nowx = x + i * (b / g);
 		int nowy = y - i * (a / g);
 		if(nowx < 0 || nowy < 0) continue;
@@ -73,7 +75,11 @@ void solve() {
 			ansc1 = nowx, ansc2 = nowy;
 		}
 	}
-	std::cout << "Yes\n" << ansc1 << ' ' << ansc2 << '\n';
+	int Lx = 1;
+	std::cout << "Yes\n"; Print(ansc1);
+	std::cout << ' ';
+	Print(ansc2);
+	std::cout << '\n';
 }
 signed main() {
 	int T = read(); 
@@ -84,6 +90,5 @@ signed main() {
 	return 0;
 }
 /*
-1
-2 1 1
+
 */
