@@ -1,7 +1,8 @@
 #include<bits/stdc++.h>
 #define int long long
+#define time tm
 const int N = 2e6 + 10, mod = 998244353, INF = 1e18;
-
+int n, m, ne[N], to[N], fi[N], num, vis[N], fa[N], d[N];
 int read() {
 	int x = 0, f = 1;
 	char ch = getchar();
@@ -28,44 +29,39 @@ void dfs(int u, int fa) {
 		dfs(v, u);
 	}
 }
-void get_true(int x) {
-	while(true) {
-		if(vis[x]) break;
-		vis[x] = true;
-		x = fa[x];
-	}
-}
+
 void solve() {
 	n = read(), m = read();
+	int s = 0;
 	for(int i = 1; i <= n; i++) {
 		int f = read();
-		fa[i] = f;
-		if(f != -1) {
-			add(f, i);
-			add(i, f);
+		if(f == -1) {
+			f = 0, s = i;
+			fa[i] = f;
+			continue;
 		}
-		else s = i;
+		fa[i] = f;
+		add(i, f); add(f, i);
 	}
+	vis[s] = true;
+	d[0] = -1;
 	dfs(s, 0);
-	int nowfa = 0;
-	std::priority_queue<int> q;
+	int sum = 0, maxn = -INF, ans = 0;
 	for(int i = 1; i <= m; i++) {
 		int x = read();
 		if(vis[x]) {
-			std::cout << 
+			std::cout << ans << '\n';
 			continue;
 		}
-		if(i == 1) {
-			nowfa = x;
-			std::cout << d[x] << '\n';
-			sum += d[x];
-			q.push(-d[x]);
-			get_true(x);
-			continue;
+		maxn = std::max(maxn, d[x]);
+		while(true) {
+			if(vis[x]) break;
+			sum++;
+			vis[x] = true;
+			x = fa[x];
 		}
-		get_true(x);
-		nowfa = ...;
-		
+		ans = sum * 2 - maxn;
+		std::cout << ans << '\n';
 	}
 }
 signed main() {
