@@ -51,8 +51,8 @@
 | 向上取整    | $\lceil \rceil$                                | `\lceil \rceil`                                       |
 | 删除线      | ~~删除~~                                       | `~~xx~~`                                              |
 | 大括号      | $$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$ | `$$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$`      |
-|             |                                                |                                                       |
-|             |                                                |                                                       |
+| 小于等于    | $a\le b$                                       | `a \le b`                                             |
+| 大于等于    | $a \ge b$                                      | `a \ge b`                                             |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
 |             |                                                |                                                       |

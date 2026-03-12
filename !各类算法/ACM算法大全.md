@@ -2567,6 +2567,36 @@ signed main() {
 
 
 
+## 7. 单调栈
+
+求一个数组中，左边和右边最靠近每个$a_i$的$\le a_i/ < a_i/ \ge a_i/ \> a_i$的数的位置在哪
+
+```c++
+for(int i = 1; i <= n; i++) {
+    while(!st.empty() && a[st.top()] >= a[i]) {//求的是最靠左的 < a[i]的
+        //如果a[st.top()]>=a[i]，那么对于j=i+1~n这些位置，如果a[j]>=a[i]，那么答案就该更新为i，而不是st.top()
+        //如果a[j]<=a[i]，那更不可能了，因为求的是<a[j]的，而a[st.top()]>=a[i]>=a[j]
+        //所以综上，无论如何st.top()在这种情况都该被弹出
+        st.pop();
+    }
+    if(!st.empty()) l[i] = st.top();
+    st.push(i);
+}
+while(!st.empty()) st.pop();//清空栈
+for(int i = n; i >= 1; i--) {
+    while(!st.empty() && a[st.top()] >= a[i]) {//求的是最靠右的 < a[i]的
+        //其余同理
+        st.pop();
+    }
+    if(!st.empty()) r[i] = st.top();//记得这里改成 r
+    st.push(i);
+}
+```
+
+
+
+
+
 # 六. 数学相关
 
 ## 1. 一些常用结论
