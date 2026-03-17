@@ -61,6 +61,16 @@ void solve() {
 		for(int i = 1; i <= n; i++) {
 			if(s[i][x] == '1') {
 				s[i][x] = '0';
+				int f = true;
+				for(int j = 0; j < p[i].size(); j++) {
+					int y = p[i][j];
+					if(s[x][y] == '1') {
+						p[i][j] = x;
+						f = false;
+						break;
+					}
+				}
+				if(f) p[i].push_back(x);
 			}
 		}
 	}
