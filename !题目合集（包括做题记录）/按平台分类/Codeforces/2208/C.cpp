@@ -22,7 +22,7 @@ void solve() {
 		c[i] = read(), p[i] = read();
 	}
 	f[n] = c[n];
-	for(int i = n - 1; i >= 1; i--) {
+	for(int i = n - 1; i >=   1; i--) {
 		f[i] = std::max(f[i + 1], f[i + 1] * (1.0 - p[i] / 100.0) + c[i]);
 	}
 	printf("%.10lf\n", f[1]);
