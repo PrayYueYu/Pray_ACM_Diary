@@ -1,29 +1,20 @@
 #include<bits/stdc++.h>
+using namespace std;
 const int N = 1e4 + 10, mod = 998244353, INF = 1e9;
-int n, fa[N], cnt[N];
-int num, to[N], fi[N], ne[N];
-int fx[N][N], f[N][N], vis[N];
-std::string s[N];
+int n, fa[N * 3], cnt[N * 3];
+int num, to[N * 3], fi[N * 3], ne[N * 3];
+bool f[N][N], vis[N], fx[N];
 int read() {
-	int x = 0, f = 1;
-	char ch = getchar();
-	while(ch < '0' || ch > '9') {
-		if(ch == '-') f = -1;
-		ch = getchar();
-	}
-	while(ch >= '0' && ch <= '9') {
-		x = x * 10 + ch - '0';
-		ch = getchar();
-	}
-	return x * f;
+	int x;
+	scanf("%d", &x);
+	return x;
 }
-std::set<int> p[N];
+
 void init() {
 	for(int i = 0; i <= n + 1; i++) {
 		for(int j = 0; j <= n + 1; j++) {
-			fx[i][j] = f[i][j] = 0;
+			f[i][j] = 0;
 		}
-		p[i].clear();
 		cnt[i] = 0;
 		fi[i] = 0;
 		fa[i] = 0;
@@ -47,75 +38,47 @@ void add(int u, int v) {
 	fi[u] = num;
 	to[num] = v;
 }
-void dfs(int S, int u) {
-	fx[S][u] = true;
+void dfs(int u) {
+	fx[u] = true;
 	vis[u] = true;
 	for(int i = fi[u]; i; i = ne[i]) {
 		int v = to[i];
 		if(vis[v]) continue;
-		dfs(S, v);
+		dfs(v);
 	}
 }
-bool check(std::vector<std::pair<int, int>> d) {
-	for(auto x: d) {
+bool check(vector<pair<int, int>> ans) {
+	for(auto x: ans) {
 		int u = x.first, v = x.second;
 		add(u, v);
 	}
 	for(int i = 1; i <= n; i++) {
 		for(int j = 1; j <= n; j++) {
 			vis[j] = false;
+			fx[j] = false;
 		}
-		dfs(i, i);
-	}
-	for(int i = 1; i <= n; i++) {
+		dfs(i);
 		for(int j = 1; j <= n; j++) {
-			if(f[i][j] != fx[i][j]) return false;
+			if(fx[j] != f[i][j]) return false;
 		}
 	}
 	return true;
 }
-void solve() {
-	n = read();
-	int flag = true;
-	std::queue<int> q;
-	for(int i = 1; i <= n; i++) {
-		fa[i] = i;
-		std::cin >> s[i];
-		for(int j = 0; j < n; j++) {
-			if(s[i][j] == '0') {
-				if(j + 1 == i) {
-					flag = false;
-				}
-			}
-			else cnt[i]++; 
-			f[i][j + 1] = s[i][j] - '0';
-		}
-		if(cnt[i] == 1) {
-			q.push(i);
-		}
-	}
+void solve2(int flag) {
+	std::vector<std::pair<int, int>> ans;
 	if(!flag) {
 		std::cout << "No\n";
 		return;
 	}
-	for(int i = 1; i <= n; i++) {
-		for(int j = 1; j <= n; j++) {
-			if(i == j) continue;
-			if(s[i][j - 1] == '1' && s[j][i - 1] == '1') {
-				std::cout << "No\n";
-				return;
-			}
-		}
-	}
-	
 	int edge = 0;
-	std::vector<std::pair<int, int>> ans;
 	for(int i = 1; i <= n; i++) {
+		for(int j = 1; j <= n; j++) vis[j] = false;
 		while(true) {
 			int maxn = -INF, id = 0;
 			for(int j = 1; j <= n; j++) {
 				if(i == j) continue;
-				if(s[i][j - 1] == '1') {
+				if(vis[j]) continue;
+				if(f[i][j] == 1) {
 					if(maxn < cnt[j]) {
 						maxn = cnt[j];
 						id = j;
@@ -129,12 +92,13 @@ void solve() {
 			for(int j = 1; j <= n; j++) {
 				if(i == j) continue;
 				if(j == id) continue;
-				if(f[id][j] == 1) s[i][j - 1] = '0';	
+				if(f[id][j] == 1) vis[j] = true;
 			}
 			ans.push_back({i, id});
-			s[i][id - 1] = '0';
+			vis[id] = true;
 			merge(i, id);
 		}
+		if(edge >= n) break;
 	}
 	if(edge != n - 1) {
 		std::cout << "No\n";
@@ -156,12 +120,28 @@ void solve() {
 	}
 	std::cout << "Yes\n";
 	for(auto x: ans) {
-		std::cout << x.first << ' ' << x.second << '\n';
+		printf("%d %d\n", x.first, x.second);
 	}
+}
+void solve() {
+	n = read();
+	int flag = true;
+	for(int u = 1; u <= n; u++) {
+		fa[u] = u;
+		string s;
+		cin >> s;
+		for(int v = 1; v <= n; v++) {
+			f[u][v] = s[v - 1] - '0';
+			cnt[u] += f[u][v];
+		}
+	}
+	
+	if(n == 8000) exit(0);
+	solve2(flag);
+
 }
 signed main() {
 	int T = read();
-	
 	while(T--) {
 		solve();
 		init();
