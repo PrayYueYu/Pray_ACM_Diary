@@ -1,4 +1,4 @@
-# gcd 与 lcm
+# $\gcd$ 与 $LCM$
 
 题目地址：[gcd 与 lcm](https://www.luogu.com.cn/problem/P10580)
 
