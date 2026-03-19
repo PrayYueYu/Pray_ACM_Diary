@@ -290,8 +290,8 @@ map<int, int> mp[N];
 ### 7.1 输入输出加速
 
 ```c++
-ios::sync_with_stdio(false);
-cin.tie(nullptr);
+std::ios::sync_with_stdio(false);
+std::cin.tie(nullptr);
 //不能使用endl
 //不能使用快读和快输
 ```
