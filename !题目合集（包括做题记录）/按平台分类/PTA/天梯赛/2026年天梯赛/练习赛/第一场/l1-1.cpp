@@ -19,12 +19,12 @@ int read() {
 	return x;
 }
 void solve() {
-
+	std::cout << "PTA shi3 wo3 jing1 shen2 huan4 fa1 !";
 }
 signed main() {
 	std::ios::sync_with_stdio(0);
 	std::cin.tie(0);
-	int T = read();
+	int T = 1; 
 	while(T--) {
 		solve();
 //		init();
