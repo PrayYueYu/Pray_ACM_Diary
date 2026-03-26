@@ -19,11 +19,13 @@ int read() {
 	return x;
 }
 void solve() {
-
+	double a, b; std::cin >> a >> b;
+	double BMI = (a / b) / b;
+	printf("%.1lf\n", BMI);
+	if(BMI > 25) std::cout << "PANG";
+	else std::cout <<"Hai Xing"; 
 }
 signed main() {
-	std::ios::sync_with_stdio(0);
-	std::cin.tie(0);
 	int T = 1; 
 	while(T--) {
 		solve();

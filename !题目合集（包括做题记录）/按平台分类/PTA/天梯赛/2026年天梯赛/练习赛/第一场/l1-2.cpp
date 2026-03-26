@@ -19,7 +19,8 @@ int read() {
 	return x;
 }
 void solve() {
-
+	double x = read(), y = read();
+	std::cout << 5000.0 - x * y / 2 - (100 - y) * (100 - x) / 2 - (100 - x) * y;
 }
 signed main() {
 	std::ios::sync_with_stdio(0);

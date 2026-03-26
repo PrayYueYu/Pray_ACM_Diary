@@ -19,7 +19,13 @@ int read() {
 	return x;
 }
 void solve() {
-
+	n = read(), m = read(), q = read();
+	while(q--) {
+		for(int i = 1; i <= n; i++) {
+			int x = read();
+			st.push()
+		}
+	}
 }
 signed main() {
 	std::ios::sync_with_stdio(0);

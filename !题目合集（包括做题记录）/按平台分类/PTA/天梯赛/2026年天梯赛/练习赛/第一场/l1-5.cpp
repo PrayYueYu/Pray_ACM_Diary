@@ -19,7 +19,30 @@ int read() {
 	return x;
 }
 void solve() {
-
+	std::string s;
+	getline(std::cin, s);
+	int cnt = 0;
+	for(int i = 0; i < s.size(); i++) {
+		if(s[i] == '6') cnt++;
+		else {
+			if(cnt > 9) {
+				std::cout << "27";
+			}
+			else if(cnt > 3) std::cout << '9';
+			else {
+				for(int j = 1; j <= cnt; j++) std::cout << '6';
+			}
+			cnt = 0;
+			std::cout << s[i];
+		}
+	}
+	if(cnt > 9) {
+		std::cout << "27";
+	}
+	else if(cnt > 3) std::cout << '9';
+	else {
+		for(int j = 1; j <= cnt; j++) std::cout << '6';
+	}
 }
 signed main() {
 	std::ios::sync_with_stdio(0);

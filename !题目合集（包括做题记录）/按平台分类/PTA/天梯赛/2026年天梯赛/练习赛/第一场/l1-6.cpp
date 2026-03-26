@@ -19,7 +19,15 @@ int read() {
 	return x;
 }
 void solve() {
-
+	int n = read();
+	for(int i = 1; i <= n; i++) {
+		std::string s;
+		std::cin >> s;
+		int a = s[0] + s[1] + s[2];
+		int b = s[3] + s[4] + s[5];
+		if(a == b) std::cout << "You are lucky!\n";
+		else std::cout << "Wish you good luck.\n";
+	}
 }
 signed main() {
 	std::ios::sync_with_stdio(0);
