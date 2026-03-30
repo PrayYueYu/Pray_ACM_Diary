@@ -675,7 +675,7 @@ int main() {
 
 ------
 
-## 3.  $2-sat$(并查集/$tarjan$，$m$对$bool$关系)
+## 3. 2-sat(并查集/$tarjan$，$m$对$bool$关系)
 
 ### 总思路
 
@@ -1368,7 +1368,96 @@ for(int i = 1; i <= n; i++) {
 
 最后答案即为$max_{f_{1,i}\geq0}(i)$
 
-时间复杂度$\sum cd_u^2(枚举ij)= O(N*M)$
+时间复杂度$\sum cd_u^2(枚举ij)= O(N*M)$​
+
+
+
+## 4. 其他常见$DP$套路
+
+### 4.1 网格$DP$
+
+#### 4.1.1 求路径方案
+
+每次能向下或者向右，初始在(1,1)最后要到(n,m)
+
+```c++
+for(int i = 1; i <= n; i++) {
+    for(int j = 1; j <= m; j++) {
+        if(i == 1 || j == 1) {
+            f[i][j] = 1;
+            continue;
+        }
+        f[i][j] = f[i - 1][j] + f[j - 1][i];
+    }
+}
+```
+
+**其实$f_{i,j}=C_{i+j-2}^{i-1}$**
+
+#### 4.1.2 网格有障碍物
+
+问题同上，新增了$k$个障碍物不能经过，求总方案数
+
+##### Method 1
+
+当$O(N*M)$比较小的时候，直接暴力$DP$
+
+```c++
+for(int i = 1; i <= n; i++) {
+    for(int j = 1; j <= m; j++) {
+        if(vis[i][j]) {//有障碍物，且优先级高于判断(1,1)这个点
+            f[i][j] = 0;
+            continue;
+        }
+        if(i == 1 && j == 1) {//在判断障碍物下面
+            f[i][j] = 1;
+            continue;
+        }
+        f[i][j] = f[i - 1][j] + f[i][j - 1];
+    }
+}
+```
+
+##### Method 2
+
+当$O(N*M)$比较大，而$O(K^2)$比较小的时候，可以用容斥+$DP$​来完成
+
+令$f_i$为起点到第$i$​个障碍物的方案数
+
+**注意，如果有重复点需要特别判断，本代码没有特别判断**
+
+```c++
+void solve() {
+	n = read(), m = read(), k = read();
+	std::vector<std::pair<int, int>> v;
+	for(int i = 1; i <= k; i++) {
+		int x = read(), y = read();
+		v.push_back({x, y});
+		if((x == 1 && y == 1) || (x == n && y == m)) {
+			std::cout << 0;
+			return;
+		}
+	}
+	v.push_back({n, m});//一定要把终点push进去，这样算出来才是对的，终点不是(n,m)的话这里要改
+	std::sort(v.begin(), v.end());//自动先按照x升序排序，再按照y升序排序 
+	for(int i = 0; i < v.size(); i++) {
+		int dx = v[i].first - 1, dy = v[i].second - 1;//注意，如果初始点不是(1,1)这里就要改
+		//(1,1)到当前点的方案，无果无障碍 
+		f[i] = C(dx + dy, dx);
+		for(int j = 0; j < i; j++) {
+			if(v[j].second > v[i].second) continue;
+			//必须满足j在i的左上角，x经过排序已经自动满足了 
+			dx = v[i].first - v[j].first;
+			dy = v[i].second - v[j].second;
+			f[i] = (f[i] - f[j] * C(dx + dy, dy) % mod + mod) % mod;
+			//f[i]减去j到i的所有方案数 
+		}
+	}
+	std::cout << f[v.size() - 1];//最后一个点是(n,m)，所以直接输出 
+}
+```
+
+
 
 
 
