@@ -1,0 +1,160 @@
+
+#include<bits/stdc++.h>
+#define int long long
+const int N = 2e6 + 10, mod = 998244353, INF = 1e18;
+int lowbit(int x) {
+	return x & (-x);
+}
+void solve() {
+	int n; std::cin >> n;
+	if(!n) {
+		std::cout << n << '\n';
+		return;
+	}
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+		n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	n -= lowbit(n);
+	std::cout << n << '\n';
+	if(!n) return;
+	
+}
+signed main() {
+solve();
+	return 0;
+}
+/*
+
+*/
