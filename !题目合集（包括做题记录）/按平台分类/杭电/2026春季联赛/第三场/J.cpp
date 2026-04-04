@@ -55,7 +55,6 @@ void solve() {
 	std::sort(a + 1, a + n + 1);
 	for(int i = 1; i < n; i++) {
 		q.push({-getC(i, i + 1), {i, i + 1}});
-		
 	}
 	int cnt = 0, ans = 0;
 	while(!q.empty()) {
@@ -63,15 +62,19 @@ void solve() {
 		int v = q.top().second.second;
 		q.pop();
 		int fau = getfa(u), fav = getfa(v);
-		if(fau == fav) continue;
+		if(fau == fav) {
+			if(to[u] < n) {
+				to[u]++;
+				q.push({-getC(u, to[u]), {u, to[u]}});
+			}
+			continue;
+		}
 		cnt++;
 		fa[fau] = fav;
-		ans += C(a[v], a[u]));
+		ans += C(a[v], a[u]);
 		ans %= mod;
-		to[u]
 		if(to[u] < n) {
 			to[u]++;
-//			std::cout << u << ' ' << to[u] << '\n';
 			q.push({-getC(u, to[u]), {u, to[u]}});
 		}
 		if(cnt >= n - 1) break;
