@@ -1,8 +1,7 @@
 #include<bits/stdc++.h>
 #define int long long
 const int N = 2e6 + 10, mod = 998244353, INF = 1e18;
-int a[N], n;
-std::string name[N];
+
 int read() {
 	int x = 0, f = 1;
 	char ch = getchar();
@@ -17,29 +16,10 @@ int read() {
 	return x * f;
 }
 void solve() {
-	n = read();
-	double sum = 0;
-	for(int i = 1; i <= n; i++) {
-		std::cin >> name[i];
-		a[i] = read();
-		sum += a[i];
-	} 
-	sum /= (double)n;
-	sum /= 2.0;
-	double minn = 200;
-	int id = 0;
-	for(int i = 1; i <= n; i++) {
-		double d = std::fabs(a[i] - sum);
-		if(d < minn) {
-			minn = d;
-			id = i;
-		}
-	}
-	printf("%.0lf", sum);
-	std::cout << ' ' << name[id];
+
 }
 signed main() {
-	int T = 1;
+	int T = read();
 	while(T--) {
 		solve();
 //		init();
