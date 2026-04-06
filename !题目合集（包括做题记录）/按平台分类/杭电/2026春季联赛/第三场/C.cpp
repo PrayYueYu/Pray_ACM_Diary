@@ -16,7 +16,7 @@ int read() {
 	return x * f;
 }
 void solve() {
-
+	
 }
 signed main() {
 	int T = read();
