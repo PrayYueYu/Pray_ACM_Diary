@@ -1228,6 +1228,7 @@ for(const auto& x: v[i]) {
 }
 auto it = upper_bound(v.begin(), v.end(), value);//也不一定是v.begin,视情况而定
 
+binary_search(v.begin(), v.end(), x);//二分查找vector中是否有x这个元素，返回bool
 vector<vector<vector<int>>> (
     n, vector<vector<int>>(
         m, vector<int>(k, 0))); //三维定义
