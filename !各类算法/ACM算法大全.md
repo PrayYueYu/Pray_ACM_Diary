@@ -2703,7 +2703,7 @@ for(int i = n; i >= 1; i--) {
 |                                                              |
 |                                                              |
 
-## 2. 线性基(异或相关问题)
+## 2. 线性基(异或相关问题，GF(2)和GF(3))
 
 **重要！！！！！特殊判断，若线性基经过高斯消元结束后秩$r<n$则能找到一个子集$XOR\ a_i=0$**
 
@@ -3042,6 +3042,58 @@ void dfs(int u, int res) {
 $g[u][i][0\to63]$表示**从$u$的父亲节点开始**到$u$往上$2^i$节点这条路径上点权的线性基
 
 (注意，是从父亲节点开始，因为$f[i][0]$​为父亲节点，所以后续使用要注意本身的点权没有算入)
+
+### 2.4 GF(3)意义下的异或线性基（三进制）
+
+**数组中每个数能用多次**
+
+基本代码：
+
+```c++
+int Bit(int x,int t){
+	return (x / p[t]) % 3;
+}
+int Xor(int x, int y) {
+	int ans = 0;
+	for(int i = 0; i <= 37; i++) {
+		ans += p[i] * ((x + y) % 3);
+		x /= 3;
+		y /= 3;
+		if(!x && !y) break;
+	}
+	return ans;
+}
+void insert(int x){
+	for(int i = 37; i >= 0; i--) {
+		int v = Bit(x, i);
+		if(!v) continue;
+		if(!vis[i]){
+			vis[i] = 1;
+			if(v == 2) x = Xor(x,x);
+			num[i] = x;
+			return;
+		}
+		if(v == 1) x = Xor(x,x);
+		x = Xor(x, num[i]);
+	}
+	return;
+}
+bool query(int x){//查询某个数是否能被组合出来
+	for(int i = 37; i >= 0; i--) {
+		if(!Bit(x, i)) continue;
+		if(!vis[i]) return false;
+		while(Bit(x, i)) x = Xor(x, num[i]);
+	}
+	if(!x) return true;
+	return false;
+}
+void solve() {
+    for(int i = 1; i <= n; i++) {
+        x = read();
+        insert(x);
+    }
+}
+```
 
 
 
