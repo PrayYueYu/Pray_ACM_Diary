@@ -1234,6 +1234,24 @@ vector<vector<vector<int>>> (
         m, vector<int>(k, 0))); //三维定义
 ```
 
+## 8. $deque$双端队列
+
+```c++
+std::deque<int> dq;
+dq.push_back(x);
+dq.push_front(x);
+dq.pop_back();
+dq.pop_front();
+dq.back();
+dq.front();
+//dq是类似于vector，连续指针
+//同时可以用下标访问
+cout<<dq[0];
+std::sort(dq.begin(), dq.end());
+```
+
+
+
 
 
 
