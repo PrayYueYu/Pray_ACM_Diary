@@ -53,7 +53,7 @@
 | 大括号      | $$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$ | `$$ \begin{cases} x = 2 \\ y = 3 \end{cases} $$`      |
 | 小于等于    | $a\le b$                                       | `a \le b`                                             |
 | 大于等于    | $a \ge b$                                      | `a \ge b`                                             |
-|             |                                                |                                                       |
+| 向右箭头    | $\to$                                          | `\to`                                                 |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
 |             |                                                |                                                       |
