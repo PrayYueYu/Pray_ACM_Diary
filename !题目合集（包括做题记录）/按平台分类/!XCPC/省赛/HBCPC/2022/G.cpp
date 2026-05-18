@@ -43,8 +43,8 @@ void solve() {
 		l--, r--;
 		if(L[r] <= l) ans = std::max(ans, r - l + 1);
 		else ans = std::max(ans, (r - l + 1) / 2 + 1);
-		std::cout << s[i] << ' ' << f[i] << '\n';
-		std::cout << l << ' ' << r << "\n\n";
+//		std::cout << s[i] << ' ' << f[i] << '\n';
+//		std::cout << l << ' ' << r << "\n\n";
 	}
 	std::cout << ans << '\n';
 
