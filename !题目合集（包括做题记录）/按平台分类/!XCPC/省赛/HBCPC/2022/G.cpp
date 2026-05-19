@@ -2,7 +2,7 @@
 #define ll long long
 using namespace std;
 const int N=2e6+2e6+10,M=1e9+7;
-int n,ans,f[N],num, L[N];
+int n,ans,f1[N], f2[N],num;
 string s1;
 char s[N];
 ll read(){
@@ -21,31 +21,30 @@ void Pre(){
 }
 void solve() {
 	getline(cin,s1);
-	int now = 0;
-	for(int i = 0; i < s1.size(); i++) {
-		if(!i || s1[i] != s1[i - 1]) {
-			now = i;
-		}
-		L[i] = now;
-	}
 	Pre();int mid=0;
-	for(int i = 0; i <= num; i++) f[i] = 0;
+	for(int i = 0; i <= num; i++) f1[i] = f2[i] = 0;
 	ans = 0;
 	for(int i=2;i<=num-2;i++){
-		if(i<=mid+f[mid])f[i]=min(f[2*mid-i],mid+f[mid]-i+1);
-		else f[i]=1;
-		while(s[i-f[i]]==s[i+f[i]])f[i]++;
-		f[i]--;
-		if(i+f[i]>mid+f[mid])mid=i;
-		int l = i - f[i] + 1, r = i + f[i] - 1;
-		l /= 2, r /= 2;
-		if(l > r) continue;
-		l--, r--;
-		if(L[r] <= l) ans = std::max(ans, r - l + 1);
-		else ans = std::max(ans, (r - l + 1) / 2 + 1);
-//		std::cout << s[i] << ' ' << f[i] << '\n';
-//		std::cout << l << ' ' << r << "\n\n";
+		if(i<=mid+f1[mid])f1[i]=min(f1[2*mid-i],mid+f1[mid]-i+1);
+		else f1[i]=1;
+		while(s[i-f1[i]]==s[i+f1[i]])f1[i]++;
+		f1[i]--;
+		if(i+f1[i]>mid+f1[mid])mid=i;
 	}
+	mid = 0;
+	for(int i=2;i<=num-2;i++){
+		if(i<=mid+f2[mid])f2[i]=min(f2[2*mid-i],mid+f2[mid]-i+1);
+		else f2[i]=1;
+		if(s[i] == '#') {
+			while(s[i - f2[i]] == s[i + f2[i]] && ((s[i + f2[i]] != '#' && s[i + f2[i]] == s[i + 1]) || s[i + f2[i]] == '#')) f2[i]++;
+		}
+		else {
+			while(s[i-f2[i]]==s[i+f2[i]] && ((s[i + f2[i]] != '#' && s[i + f2[i]] == s[i]) || (s[i + f2[i]] == '#'))) f2[i]++;
+		}
+		f2[i]--;
+		if(i+f2[i]>mid+f2[mid])mid=i;
+		ans = std::max(ans, (f1[i] - f2[i]) / 2 + f2[i]);
+	}	
 	std::cout << ans << '\n';
 
 }
