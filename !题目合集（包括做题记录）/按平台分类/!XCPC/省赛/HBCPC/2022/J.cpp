@@ -35,21 +35,14 @@ void solve() {
     int n, q;
     cin >> n >> q;
     vector<int> a(n + 1);
-    vector<vector<int>> val_pos(n + 1);
-    for (int i = 1; i <= n; i++) {
-        cin >> a[i];
-        val_pos[a[i]].push_back(i);
-    }
+    for (int i = 1; i <= n; ++i) cin >> a[i];
 
-    // 对每个 g，收集所有倍数的位置（自动有序）
+    // 每个 g 的倍数位置（自动有序）
     vector<vector<int>> pos(n + 1);
-    for (int g = 1; g <= n; g++) {
-        for (int mult = g; mult <= n; mult += g) {
-            for (int idx : val_pos[mult]) {
-                pos[g].push_back(idx);
-            }
+    for (int i = 1; i <= n; ++i) {
+        for (int g : divs[a[i]]) {
+            if (g <= n) pos[g].push_back(i);
         }
-        // pos[g] 已经有序，因为我们是按 mult 递增、val_pos[mult] 内部有序插入的
     }
 
     // 桶装区间：intervals_at_L[L] = { (R, g) }
