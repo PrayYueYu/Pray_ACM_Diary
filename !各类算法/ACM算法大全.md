@@ -5533,6 +5533,7 @@ void dfs(int u, int fa, int d) {
     for(int i = fi[u]; i; i = ne[i]) {
         int v = to[i];
         if(v == fa) continue;//对于树，只要不走“回头路”即不会重复查询
+        len[v] = len[u] + w[i];//w是边长
         dfs(v, u, d + 1);
     }
 }
@@ -5573,6 +5574,12 @@ int lca(int x, int y) {
     return f[x][0];
 }
 ```
+
+### 3.3 求任意两点x到y距离
+
+$d=len_x + len_y - 2 * len_{LCA(x,y)}$​
+
+**注意是$len$不是$dep$，因为有一些题目边长不是默认为1**
 
 ## 4. 图论·一些定义
 
