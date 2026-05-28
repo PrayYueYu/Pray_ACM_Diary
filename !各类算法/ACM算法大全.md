@@ -4002,7 +4002,7 @@ int main() {
 #include<cmath>
 #define ll long long
 using namespace std;
-const ll N = 4e6 + 100, M = 1e9 + 7, INF = 1e13;
+const ll N = 4e6 + 100, M = 998244353, INF = 1e13;
 const ll D = pow(2, 15);
 
 ll mod, f[N], wx[N], inv_w[N], g = 3, a[N], b[N];
@@ -4030,20 +4030,20 @@ void init() {
 	}
 } 
 
-void NTT(ll *a, int type) {
+void NTT(long long *a, int type) {
 	for (int i = 0; i < Max; ++i) {
 	    if(i < f[i]) swap(a[i], a[f[i]]);
 	}
     for(int mid = 1, tx = 1; mid < Max; mid <<= 1, tx++) { 
-    	ll W = 0;
+    	long long W = 0;
     	if(type == 1) W = wx[tx];
     	else W = inv_w[tx];
-    	ll len = mid << 1;//区间长度 
+    	long long len = mid << 1;//区间长度 
     	for(int j = 0; j < Max; j += len) { 
     		ll w = 1;
     		for(int k = 0; k < mid; k++) {//每个区间枚举前一半 
-    			ll u = a[j + k];
-    			ll v = (w * a[j + k + mid]) % mod;
+    			long long u = a[j + k];
+    			long long v = (w * a[j + k + mid]) % mod;
     			a[j + k] = (u + v) % mod;
     			a[j + k + mid] = (u - v + mod) % mod;
     			w = (w * W) % mod;
@@ -4051,7 +4051,7 @@ void NTT(ll *a, int type) {
 		}
 	}
     if(type == -1) {
-        ll inv_n = ksm(Max, mod - 2);
+        long long inv_n = ksm(Max, mod - 2);
         for(int i = 0; i <= n + m; i++) a[i] = (a[i] * inv_n) % mod;
     }
 }

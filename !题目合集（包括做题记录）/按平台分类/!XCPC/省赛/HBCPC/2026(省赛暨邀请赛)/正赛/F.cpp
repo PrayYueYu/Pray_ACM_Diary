@@ -48,7 +48,8 @@ void solve() {
 	for(auto x: s) {
 		for(int i = 1; i <= sqrt(x); i++) {
 			if(x % i == 0) {
-				if((x / i) > n / 2) continue;
+				if((x / i) > (n + 1) / 2) continue;
+//				std::cout << i << ' ' << (x / i) << '\n';
 				num[i + (x / i)]++;
 			}
 		}
@@ -57,7 +58,7 @@ void solve() {
 	for(int i = 1; i <= n; i++) {
 		maxn = std::max(maxn, num[i]);
 	}
-	for(int i = 1; i <= n; i++) {
+	for(int i = n; i >= 1; i--) {
 		if(maxn == num[i]) {
 			std::cout << "! " << i;
 			std::cout << '\n';
