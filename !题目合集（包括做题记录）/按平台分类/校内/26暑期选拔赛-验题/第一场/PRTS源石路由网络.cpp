@@ -61,7 +61,7 @@ signed main() {
 	std::ios::sync_with_stdio(false);
 	std::cin.tie(0);
 	std::cout.tie(0); 
-	freopen("2.in", "r", stdin);
+//	freopen("2.in", "r", stdin);
 	int T; std::cin >> T;
 	while(T--) {
 		solve();
