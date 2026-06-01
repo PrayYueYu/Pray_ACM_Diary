@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 #define int long long
-const int N = 2e3 + 10, mod = 998244353, INF = 1e18;
+const int N = 1e3 + 10, mod = 998244353, INF = 1e18;
 int sum[N][N], maxn[N][N], a[N][N], fc[N][N], sumf[N][N];
 int n, m, c, f, to[N][N];
 int read() {
