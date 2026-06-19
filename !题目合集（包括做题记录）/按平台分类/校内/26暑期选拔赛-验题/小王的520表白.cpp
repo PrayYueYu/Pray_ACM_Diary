@@ -79,7 +79,7 @@ void solve() {
 	solve1();
 }
 signed main() {
-//	freopen("plant11.in", "r", stdin);
+	freopen("plant17.in", "r", stdin);
 	int T, id; std::cin >> T >> id;
 	while(T--) {
 		solve();
