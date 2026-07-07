@@ -1,71 +1,82 @@
 #include<bits/stdc++.h>
 #define int long long
 #define ll long long
-const int N = 200 + 10, mod = 1000000007;
-int a[N][N][N], b[N][N], now[N][N], c[N][N], rk[N][N], n, m;
+const int N = 2000 + 10, mod = 1000000007;
+int a[N][N], b[N][N], now[N][2][N], c[N][N], n, m;
+int B[N][2][N], rk[N][2][N];
 std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 ll RandLL(ll L, ll R) {
     return std::uniform_int_distribution<ll>(L, R)(rng);
 }
-void Matrix_Mul(int id) {
-	for(int i = 1; i <= n; i++) c[1][i] = 0;
-	for(int i = 1; i <= n; i++) {
-		for(int k = 1; k <= n; k++) {
-			c[1][i] = (c[1][i] + now[1][k] * a[id][k][i]) % mod;
-		}
+int read() {
+	int x = 0, f = 1; char ch = getchar();
+	while(ch < '0' || ch > '9') {
+		if(ch == '-') f = -1;
+		ch = getchar();
 	}
-	for(int i = 1; i <= n; i++) now[1][i] = c[1][i];
+	while(ch >= '0' && ch <= '9') {
+		x = x * 10 + ch - '0';
+		ch = getchar();
+	}
+	return x * f;
 }
-bool check() {
+void Mul_A(int id) {
 	for(int i = 1; i <= n; i++) c[1][i] = 0;
 	for(int i = 1; i <= n; i++) {
 		for(int k = 1; k <= n; k++) {
-			c[1][i] = (c[1][i] + rk[1][k] * b[k][i]) % mod;
+			c[1][i] = (c[1][i] + now[id][1][k] * a[k][i]) % mod;
 		}
 	}
+	for(int i = 1; i <= n; i++) now[id][1][i] = c[1][i];
+}
+void Mul_B(int id) {
+	for(int i = 1; i <= n; i++) B[id][1][i] = 0;
 	for(int i = 1; i <= n; i++) {
-		if(c[1][i] != now[1][i]) return false;
+		for(int k = 1; k <= n; k++) {
+			B[id][1][i] = (B[id][1][i] + rk[id][1][k] * b[k][i]) % mod;
+		}
 	}
-	return true;
 }
 void solve() {
-	std::cin >> n >> m;
+	n = read(), m = read(); 
+	for(int t = 1; t <= 5; t++) {
+		for(int i = 1; i <= n; i++) {
+			now[t][1][i] = RandLL(0, mod - 1);
+			rk[t][1][i] = now[t][1][i];
+		}
+	}
 	for(int i = 1; i <= m; i++) {
 		for(int j = 1; j <= n; j++) {
 			for(int k = 1; k <= n; k++) {
-				std::cin >> a[i][j][k];
+				a[j][k] = read();
 			}
+		}
+		for(int t = 1; t <= 5; t++) {
+			Mul_A(t);
 		}
 	}
 	for(int i = 1; i <= n; i++) {
 		for(int j = 1; j <= n; j++) {
-			std::cin >> b[i][j];
+			b[i][j] = read();
 		}
 	}
-	int t = 5;
-	bool flag = true;
-	while(t--) {
+	int flag = true;
+	for(int t = 1; t <= 5; t++) {
+		Mul_B(t);
 		for(int i = 1; i <= n; i++) {
-			now[1][i] = RandLL(0, mod - 1);
-			rk[1][i] = now[1][i];
-		}
-		for(int i = 1; i <= m; i++) {
-			Matrix_Mul(i);
-		}
-		if(!check()) {
-			flag = false;
-			break;
+			if(now[t][1][i] != B[t][1][i]) {
+				flag = false;
+				break;
+			}
 		}
 	}
 	if(flag) std::cout << "YES\n";
 	else std::cout << "NO\n";
 }
 signed main() {
-	std::ios::sync_with_stdio(false);
-	std::cin.tie(0);
-	std::cout.tie(0);
+	freopen("1.in", "r", stdin);
 	int T; 
-	std::cin >> T;
+	T = read();
 	while(T--) {
 		solve();
 //		init();

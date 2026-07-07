@@ -1,8 +1,8 @@
 #include<bits/stdc++.h>
 #define int long long
 #define ll long long
-const int N = 200 + 10, mod = 1000000007;
-int n, m, a[N][N][N], c[N][N], now[N][N], b[N][N], cnt[22];
+const int N = 2000 + 10, mod = 1000000007;
+int n, m, a[3][N][N], c[N][N], now[N][N], b[N][N], cnt[22];
 bool ans[22][5000005];
 std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 ll RandLL(ll L, ll R) {
@@ -62,7 +62,7 @@ bool solve(int Minn, int Maxn, int Minm, int Maxm, bool f) {
 	return true;
 }
 signed main() {
-	for(int tt = 1; tt <= 1; tt++) {
+	for(int tt = 20; tt <= 20; tt++) {
 		std::string s = std::to_string(tt) + ".in";
 		freopen(s.c_str(), "w", stdout);
 		
@@ -87,10 +87,15 @@ signed main() {
 			Maxn = 50, Maxm = 50;
 			T = 40;
 		}
-		else {
+		else if(tt <= 19){
 			Minn = 1, Minm = 1;
 			Maxn = 100, Maxm = 100;
 			T = 5;
+		}
+		else {
+			Minn = 1000, Maxn = 1000;
+			Minm = 2, Maxm = 2;
+			T = 2;
 		}
 		cnt[tt] = T;
 		std::cout << T << '\n';
@@ -99,7 +104,7 @@ signed main() {
 			ans[tt][i] = solve(Minn, Maxn, Minm, Maxm, f);
 		}
 	}
-	for(int tt = 1; tt <= 1; tt++) {
+	for(int tt = 20; tt <= 20; tt++) {
 		std::string s = std::to_string(tt) + ".out";
 		freopen(s.c_str(), "w", stdout);
 		for(int i = 1; i <= cnt[tt]; i++) {
