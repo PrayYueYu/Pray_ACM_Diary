@@ -26,9 +26,10 @@ int ksm(int x, int y) {
 }
 void solve() {
 	std::cin >> n >> m >> r >> c;
-	int ans = ksm(2, (r + c - 1));
-	ans = ans * (ksm(2, n + m - r - c)) % mod;
-	std::cout << ans << '\n';
+	int ans = 1;
+	ans = ans * (ksm(2, n * m - (n - r + 1) * (m - c + 1))) % mod;
+	std::cout << ans << '\n'; 
+	
 }
 signed main() {
 	int T = 1; 
