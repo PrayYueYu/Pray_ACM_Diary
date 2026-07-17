@@ -274,10 +274,9 @@ int check(int a1, int b1, int a2, int b2) {
 		return 3;
 	}
 	if(f1 == 10 || f1 == 12) return 3;
-
-		if(p1[1].b > p2[1].b) return 1;
-		if(p2[1].b > p1[1].b) return 2;
-		return 3;
+	if(p1[1].b > p2[1].b) return 1;
+	if(p2[1].b > p1[1].b) return 2;
+	return 3;
 	
 }
 void solve() {
@@ -310,7 +309,9 @@ void solve() {
 					int w2 = (a2 - 1) * 13 + b2;
 					if(vis[w1] || vis[w2] || w1 == w2) continue;
 					int f = check(a1, b1, a2, b2);
-					if(f == 1) win[1][w1]++;
+					if(f == 1) {
+						win[1][w2] = true;
+					}
 					else if(f == 2) win[2][w2]++;
 					for(int i = 1; i <= 4; i++) {
 						p2[i].a = p4[i].a;
@@ -330,14 +331,14 @@ void solve() {
 			return;
 		}
 	}
-	int val = 0;
+	int val = 0, cx = 0;
 	for(int i = 1; i <= 52; i++) {
-		if(win[1][i] == 43) {
-			val++;
+		if(win[1][i] == false && !vis[i]) {
+			std::cout << "PaiMeiYouWenTi\n";
+			return;
 		}
 	}
-	if(val >= 2) std::cout << "WoYaoYanPai\n";
-	else std::cout << "PaiMeiYouWenTi\n";
+	std::cout << "WoYaoYanPai\n";
 }
 signed main() {
 //	std::ios::sync_with_stdio(false);
