@@ -358,7 +358,7 @@ while(true) {
 }
 ```
 
-## 9. 三角公式
+## 9. 三角/向量相关
 
 ### 1. 求极角
 
@@ -377,6 +377,36 @@ $c$++中用的**弧度制**
 //求π
 long double pi = acosl(-1.0);//acos()是double
 ```
+
+### 3. 两个向量夹角
+
+```c++
+double angle(double x1, double y1, double x2, double y2) {
+    double dot = x1 * x2 + y1 * y2;
+    double det = x1 * y2 - y1 * x2;
+    return std::fabs(atan2(det, dot));  // 结果在 [0, π]
+}
+```
+
+### 4. 向量叉乘
+
+向量 **a × b**（二维叉积，即 `det = x1*y2 - y1*x2`）的正负含义：
+
+正（>0）：从 **a** 旋转到 **b** 需要逆时针旋转（角度在 0 到 π 之间）
+
+负（<0）：从 **a** 旋转到 **b** 需要顺时针旋转（角度在 -π 到 0 之间）
+
+零（=0）：两向量 **共线**（同向或反向）
+
+```c++
+double cross(double x1, double y1, double x2, double y2) {
+    return x1 * y2 - y1 * x2;
+}
+```
+
+
+
+
 
 ## 10. 三分
 
@@ -2037,103 +2067,130 @@ int main() {
 
 ```c++
 #include<bits/stdc++.h>
-#define ll long long
-using namespace std;
-const ll N = 1e6 + 100, M = 998244353, CN = 1e6 + 10;
-int n, m, q, pd[N], num[N], x[N], y[N], a[N], op[N];
-ll read() {
-	ll x = 0, f = 1; char ch = getchar();
-	while(ch < '0' || ch > '9') {if(ch == '-') f = -1; ch = getchar();}
-	while(ch >= '0' && ch <= '9') {x = x * 10 + ch - '0'; ch = getchar();}
+#define int long long
+#define ciallo(i,x,y,z) for(int i=x;i<=y;i+=z)
+const int N = 2e6 + 10, mod = 998244353, INF = 1e18;
+int n, m, q, a[N], op[N], l[N], r[N];
+int sum[N], pd[N];
+int read() {
+	int x = 0, f = 1;
+	char ch = getchar();
+	while(ch < '0' || ch > '9') {
+		if(ch == '-') f = -1;
+		ch = getchar();
+	}
+	while(ch >= '0' && ch <= '9') {
+		x = x * 10 + ch - '0';
+		ch = getchar();
+	}
 	return x * f;
 }
-void build(int l, int r, int p, int c) {
+void pushup(int p) {
+	sum[p] = sum[p << 1] + sum[p << 1 | 1];
+}
+void build(int p, int l, int r, int c) {
 	pd[p] = 0;
 	if(l == r) {
-		if(a[l] >= c)  {
-			num[p] = 1;
-		}
-		else num[p] = 0;
+		if(a[l] >= c) sum[p] = 1;
+		else sum[p] = 0; 
 		return;
 	}
 	int mid = (l + r) >> 1;
-	build(l, mid, p * 2, c);
-	build(mid + 1, r, p * 2 + 1, c);
-	num[p] = num[p * 2] + num[p * 2 + 1];
+	build(p << 1, l, mid, c);
+	build(p << 1 | 1, mid + 1, r, c);
+	pushup(p);
 }
-void Lazy(int l, int r, int p, int c) {
-	int cx = 1;
-	if(c == -1 || !c) c = 0, cx = -1;
-	num[p] = (r - l + 1) * c;
-	pd[p] = cx;
+void Lazy(int p, int l, int r, int c) {
+	int t = 1;
+	if(c == -1) t = 0;
+	sum[p] = (r - l + 1) * t;
+	pd[p] = c;
 }
-void pushdown(int l, int r, int p) {
+void pushdown(int p, int l, int r) {
+	//pd = 0 -> 无懒标记
+	//pd = 1 -> 区间赋值为 1
+	//pd = -1 -> 区间赋值为 0
 	if(!pd[p]) return;
 	int mid = (l + r) >> 1;
-	Lazy(l, mid, p * 2, pd[p]);
-	Lazy(mid + 1, r, p * 2 + 1, pd[p]);
+	Lazy(p << 1, l, mid, pd[p]);
+	Lazy(p << 1 | 1, mid + 1, r, pd[p]);
 	pd[p] = 0;
 }
-void update(int l, int r, int p, int lx, int rx, int c) {
+void update(int p, int l, int r, int lx, int rx, int c) {
 	if(lx > rx) return;
 	if(rx < l || r < lx) return;
 	if(lx <= l && r <= rx) {
-		Lazy(l, r, p, c);
+		if(!c) Lazy(p, l, r, -1);
+		else Lazy(p, l, r, 1);
 		return;
 	}
-	pushdown(l, r, p);
+	pushdown(p, l, r);
 	int mid = (l + r) >> 1;
-	update(l, mid, p * 2, lx, rx, c);
-	update(mid + 1, r, p * 2 + 1, lx, rx, c);
-	num[p] = num[p * 2] + num[p * 2 + 1];
+	update(p << 1, l, mid, lx, rx, c);
+	update(p << 1 | 1, mid + 1, r, lx, rx, c);
+	pushup(p);
 }
-int query(int l, int r, int p, int lx, int rx) {
+int query(int p, int l, int r, int lx, int rx) {
+	//查找 [lx, rx] 中 1 的数量
 	if(rx < l || r < lx) return 0;
-	if(lx <= l && r <= rx) return num[p];
-	int ans = 0;
-	int mid = (l + r) >> 1;
-	pushdown(l, r, p);
-	ans += query(l, mid, p * 2, lx, rx);
-	ans += query(mid + 1, r, p * 2 + 1, lx, rx);
-	num[p] = num[p * 2] + num[p * 2 + 1];
+	if(lx <= l && r <= rx) return sum[p];
+	pushdown(p, l, r);
+	int ans = 0, mid = (l + r) >> 1;
+	ans += query(p << 1, l, mid, lx, rx);
+	ans += query(p << 1 | 1, mid + 1, r, lx, rx);
+	pushup(p);
 	return ans;
 }
 bool check(int mid) {
-	build(1, n, 1, mid);
-	for(int i = 1; i <= m; i++) {
-		int t = query(1, n, 1, x[i], y[i]), Len = y[i] - x[i] + 1; 
-		if(op[i] == 0) {
-			t = Len - t;
-			update(1, n, 1, x[i], x[i] + t - 1, 0);
-			update(1, n, 1, x[i] + t, y[i], 1);
+	build(1, 1, n, mid);
+	ciallo(i, 1, m, 1) {
+		int num = query(1, 1, n, l[i], r[i]);//为 1 的数量 
+		int len = r[i] - l[i] + 1;
+		if(!op[i]) {
+			num = len - num;//为 0 的数量 
+			update(1, 1, n, l[i], l[i] + num - 1, 0);
+			update(1, 1, n, l[i] + num, r[i], 1);
+			//把 [l, l + num - 1] 变成 0
+			//把 [l + num, r] 变成 1
 		}
 		else {
-			update(1, n, 1, x[i], x[i] + t - 1, 1);
-			update(1, n, 1, x[i] + t, y[i], 0);
+			update(1, 1, n, l[i], l[i] + num - 1, 1);
+			update(1, 1, n, l[i] + num, r[i], 0);
+			//把 [l, l + num - 1] 变成 1
+			//把 [l + num, r] 变成 0s	
 		}
 	}
-	if(query(1, n, 1, q, q)) return true;
+	if(query(1, 1, n, q, q) == 1) return true;
 	return false;
 }
-int main() {
+void solve() {
 	n = read(), m = read();
-	for(int i = 1; i <= n; i++) a[i] = read();
-	for(int i = 1; i <= m; i++) {
+	ciallo(i, 1, n, 1) a[i] = read();
+	ciallo(i, 1, m, 1) {
 		op[i] = read();
-		x[i] = read();
-		y[i] = read();
-	}
+		l[i] = read();
+		r[i] = read();
+	} //记录操作 
+	
 	q = read();
 	int l = 1, r = n;
-	while(l < r) {
+	while(l < r) { 
 		int mid = (l + r + 1) >> 1;
 		if(check(mid)) l = mid;
 		else r = mid - 1;
-	}
-	cout << l;
+	}//二分查找 
+	std::cout << l << '\n';
+}
+signed main() {
+	int T = 1; 
+	while(T--) solve();
 	return 0;
 }
-//月雩·薇嫭 
+/*
+----------------------
+	Writer: 月雩薇嫭 | 
+----------------------
+*/
 ```
 
 ## 2. 笛卡尔树
