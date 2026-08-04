@@ -60,14 +60,12 @@ void solve() {
 		while(true) {
 			if(now == n + 1) break;
 			if(s[now].l >= t[i].l) {
-//				std::cout << i << ' ' << s[now].l << ' ' << s[now].r << '\n';
 				insert(s[now].r, to[s[now].r] - s[now].l + 1);
 				now++;
 			}
 			else break;
 		}
 		ans[t[i].id] = query(t[i].r);
-//		exit(0);
 	}
 
 	for(int i = 1; i <= q; i++) {
@@ -86,25 +84,6 @@ signed main() {
 	return 0;
 }
 /*
-2
-5 3
-1 5
-2 4
-3 3
-6 8
-7 10
-1 5
-2 6
-7 12
-5 3
-1 5
-2 4
-3 3
-6 8
-7 10
-1 5
-2 6
-7 12
 ----------------------
 	Writer: ÔÂö§Ş±‹¬ | 
 ----------------------
