@@ -388,7 +388,7 @@ double angle(double x1, double y1, double x2, double y2) {
 }
 ```
 
-### 4. 向量叉乘
+### 4. 向量叉乘（叉积）
 
 向量 **a × b**（二维叉积，即 `det = x1*y2 - y1*x2`）的正负含义：
 
@@ -5030,163 +5030,29 @@ signed main(){
 */
 ````
 
-## 19. 二维凸包
-
-**定义：**二维平面上$n$个点，用一根橡皮筋把它们包围住（即使得面积最小且能包住所有点）的多边形称为凸包
-
-显然凸包由这$n$个点的某些点构成
-
-**注意，凸包的边在某些情况下可能是圆弧**
-
-### 方法1. 模拟法
-
-找到$y$值最小的一个点，以它为中心展开一条$k=0$的直线，然后不断逆时针旋转，以碰到的第一个点为新的中心，继续旋转，知道$p_{new}=p_1$为止。如果同时有$\geq 2$个点都是同时出现，选择离当前点最远的点为新的中心。
-
-缺点：代码复杂度极高，且遇到$k=INF$则基本上没办法正常工作
-
-### 方法2. $Graham$算法
-
-$step1:$去重
-
-$step2:$选取$y$最小（若有多个，选$x$最小）的点设为$P_1$
-
-$step3:$其它的点按照对于$P_1$的[极角](# 1. 求极角)排序，依此为$p_{2...n}$​，如下：
-
-​	**即，令其它点坐标为$(p_{ix}-p_{1x},p_{iy}-p_{1y})$，然后计算$atan2(y,x)$（极角）**
-
-![HDJxANk8IqrWcE1](ACM算法集合.assets/HDJxANk8IqrWcE1.png)
-
-$step4:$按照顺序依次加入（入栈）。不难发现，若当前搜寻到$i$，那第$i$​个点一定会成为凸包上的一个点
-
-$step5:$假设当前把第$i$个点加入凸包，假设现在栈内如下：$[p_i,p_j,p_k]$，如果发现$p_j$在$p_i$和$p_k$所连的线的下面，则说明$p_j$不应该在凸包上，将$p_j$删掉（判断$\mathbf{\vec{p_k p_j}} \times \mathbf{\vec{p_j p_i}}$的大小，$\leq0$代表需要弹出栈）
-
-$step6:$​不断搜寻，直至结束，栈内即为凸包上的点
-
-**时间复杂度：$O(NlogN)$**
-
-#### Code
-
-```c++
-#include<bits/stdc++.h>
-#include<cmath>
-#define ll long long
-#define int long long
-using namespace std;
-const ll N = 1e5 + 100, M = 1e9 + 7, INF = 1e16;	
-int n;
-ll read() {
-	ll x = 0, f = 1; char ch = getchar();
-	while(ch < '0' || ch > '9') {if(ch == '-') f = -1; ch = getchar();}
-	while(ch >= '0' && ch <= '9') {x = x * 10 + ch - '0'; ch = getchar();}
-	return x * f;
-}
-struct Point {//点集都用结构体存 
-	double x, y;
-} s[N], st[N];
-//st: 栈 
-double calc_Len(Point a, Point b) {//计算两点距离 
-	double dx = a.x - b.x;
-	double dy = a.y - b.y;
-	return sqrt(dx * dx + dy * dy);
-}
-double calc_S(Point a, Point b) {
-	double ans = (a.x * b.y - a.y * b.x);
-	ans = ans / 2.0;
-	return ans;
-}
-double check(Point a1, Point a2, Point b1, Point b2) {
-	//向量a1->a2和向量b1->b2 
-	double ux = a2.x - a1.x;
-	double uy = a2.y - a1.y;
-	double vx = b2.x - b1.x;
-	double vy = b2.y - b1.y;
-	return ux * vy - uy * vx;
-	//返回向量叉乘积 
-}
-bool cmp(Point a, Point b) {
-	double now = check(s[1], a, s[1], b);//这里顺序不要错了！！ 
-	//通过叉乘来替代极角，避免浮点误差 
-	if(now > 0) return true;
-	else if(now < 0) return false;
-	//如果共线 
-	return calc_Len(s[1], a) < calc_Len(s[1], b);//近的排前面 
-}
-void Printf(double x, int L) {
-	cout << fixed << setprecision(L) << x << endl;
-}
-signed main(){
-	n = read();	
-	int new_n = 0, num = 0;
-	double Minx = 1e18, Miny = 1e18;//这里记得根据实际情况调整！！！！！
-	for(int i = 1; i <= n; i++) {
-		double x, y;
-		cin >> x >> y;
-		
-		//将(x,y)压入s 
-		s[++new_n].x = x;
-		s[new_n].y = y;
-		if(new_n >= 2) {//令s[1]为基准点，找到符合条件基准点 
-			if(s[new_n].y < s[1].y) {
-				swap(s[new_n], s[1]);
-			}
-			else if(s[new_n].y == s[1].y) {
-				if(s[new_n].x < s[1].x) {
-					swap(s[new_n], s[1]);
-				}
-			}
-		}
-	}
-	n = new_n;
-	sort(s + 2, s + n + 1, cmp);//按照极角排序
-	//从第二个开始，第一个是基准点 
-	
-	s[0].x = s[1].x - 1;//保证不同 
-	for(int i = 1; i <= n; i++) {//依次入栈 
-		if(s[i].x == s[i - 1].x && s[i].y == s[i - 1].y) 
-			continue;//去重 
-		while(num >= 2) {
-			if(check(st[num - 1], st[num], st[num], s[i]) <= 0) {
-				num--;
-				//这里check顺序不要写错了！！！！！ 
-			} 
-			else break;
-		}
-		st[++num] = s[i];
-	}
-	st[++num] = s[1];//最后一个和第一个相同，形成循环 
-	double C = 0, S = 0;//周长 和 面积 
-	for(int i = 1; i < num; i++) {
-		C += calc_Len(st[i], st[i + 1]);//计算凸包周长
-		S += calc_S(st[i], st[i + 1]);
-	}
-	Printf(C, 2);//四舍五入两位输出 
-	cout << endl;
-	printf("%.2lf\n", S);//保留两位输出
-	return 0;
-}
-//月雩·薇嫭 
-```
 
 
 
 
-
-
-
-## 20. 向量叉积
+## 19. 向量叉积
 
 有两个向量$\vec{a}=(ax,ay),\vec{b}=(bx,by)$
 
-令$p=\mathbf{\vec{a}} \times \mathbf{\vec{b}}=ax\cdot by+ay\cdot bx$​
+令$p=\mathbf{\vec{a}} \times \mathbf{\vec{b}}=ax\cdot by-ay\cdot bx$​
 
 ### 表示含义
 
 1. 表示三角形面积
-2. 若$p>0$，代表$\vec{a}$通过顺时针旋转$(0,\pi)$的角度到$\vec{b}$;      $p=0$，$\vec{a},\vec{b}$​共线;       $p<0$，$\vec{a}$通过逆时针旋转$(0,\pi)$的角度到$\vec{b}$​
+
+2. 若$p>0$，代表$\vec{a}$通过逆时针旋转$(0,\pi)$的角度到$\vec{b}$;      
+
+   $p=0$，$\vec{a},\vec{b}$​共线;       
+
+   $p<0$，$\vec{a}$通过顺时针旋转$(0,\pi)$的角度到$\vec{b}$​
 
 
 
-## 21. 扩展欧几里得 $Exgcd$
+## 20. 扩展欧几里得 $Exgcd$
 
 这里直接讲$a·x+b·y=d$（假设$a,\ b,\ d$都是正整数）​
 
@@ -5196,7 +5062,7 @@ signed main(){
 
 $exgcd$求的是$a·x+b·y=\gcd(a,b)$的一组解
 
-### 21.1 基本代码
+### 20.1 基本代码
 
 ```c++
 int Exgcd(int a, int b, int &x, int &y) {
@@ -5219,7 +5085,7 @@ void solve(int a, int b, int d) {
 }
 ```
 
-## 21.2 通解
+### 20.2 通解
 
 得到一组解$(x_0,\ y_0)$​之后（通过$exgcd$求得的$(x_0,\ y_0)$记得先 乘上$\frac{d}{g}$才对），可以得到通解：
 
@@ -5228,7 +5094,7 @@ x = x_0 + t · \frac{b}{g} \\ \\
 y = y_0 - t · \frac{a}{g}
 \end{cases}$​​
 
-### 21.3 最小非负整数解
+### 20.3 最小非负整数解
 
 以$x$为例，写出不等式可以有：$x_0+t·\frac{b}{g} >= 0$
 
@@ -7013,6 +6879,349 @@ int main() {
 }
 //月雩·薇嫭
 ```
+
+
+
+## 2. 二维凸包
+
+**定义：**二维平面上$n$个点，用一根橡皮筋把它们包围住（即使得面积最小且能包住所有点）的多边形称为凸包
+
+显然凸包由这$n$个点的某些点构成
+
+**注意，凸包的边在某些情况下可能是圆弧**
+
+### 方法1. 模拟法
+
+找到$y$值最小的一个点，以它为中心展开一条$k=0$的直线，然后不断逆时针旋转，以碰到的第一个点为新的中心，继续旋转，知道$p_{new}=p_1$为止。如果同时有$\geq 2$个点都是同时出现，选择离当前点最远的点为新的中心。
+
+缺点：代码复杂度极高，且遇到$k=INF$则基本上没办法正常工作
+
+### 方法2. $Graham$算法
+
+$step1:$去重
+
+$step2:$选取$y$最小（若有多个，选$x$最小）的点设为$P_1$
+
+$step3:$其它的点按照对于$P_1$的[极角](# 1. 求极角)排序，依此为$p_{2...n}$​，如下：
+
+​	**即，令其它点坐标为$(p_{ix}-p_{1x},p_{iy}-p_{1y})$，然后计算$atan2(y,x)$（极角）**
+
+![HDJxANk8IqrWcE1](ACM算法集合.assets/HDJxANk8IqrWcE1.png)
+
+$step4:$按照顺序依次加入（入栈）。不难发现，若当前搜寻到$i$，那第$i$​个点一定会成为凸包上的一个点
+
+$step5:$假设当前把第$i$个点加入凸包，假设现在栈内如下：$[p_i,p_j,p_k]$，如果发现$p_j$在$p_i$和$p_k$所连的线的下面，则说明$p_j$不应该在凸包上，将$p_j$删掉（判断$\mathbf{\vec{p_k p_j}} \times \mathbf{\vec{p_j p_i}}$的大小，$\leq0$代表需要弹出栈）
+
+$step6:$​不断搜寻，直至结束，栈内即为凸包上的点
+
+**时间复杂度：$O(NlogN)$**
+
+#### Code
+
+```c++
+#include<bits/stdc++.h>
+#include<cmath>
+#define ll long long
+#define int long long
+using namespace std;
+const ll N = 1e5 + 100, M = 1e9 + 7, INF = 1e16;	
+int n;
+ll read() {
+	ll x = 0, f = 1; char ch = getchar();
+	while(ch < '0' || ch > '9') {if(ch == '-') f = -1; ch = getchar();}
+	while(ch >= '0' && ch <= '9') {x = x * 10 + ch - '0'; ch = getchar();}
+	return x * f;
+}
+struct Point {//点集都用结构体存 
+	double x, y;
+} s[N], st[N];
+//st: 栈 
+double calc_Len(Point a, Point b) {//计算两点距离 
+	double dx = a.x - b.x;
+	double dy = a.y - b.y;
+	return sqrt(dx * dx + dy * dy);
+}
+double calc_S(Point a, Point b) {
+	double ans = (a.x * b.y - a.y * b.x);
+	ans = ans / 2.0;
+	return ans;
+}
+double check(Point a1, Point a2, Point b1, Point b2) {
+	//向量a1->a2和向量b1->b2 
+	double ux = a2.x - a1.x;
+	double uy = a2.y - a1.y;
+	double vx = b2.x - b1.x;
+	double vy = b2.y - b1.y;
+	return ux * vy - uy * vx;
+	//返回向量叉乘积 
+}
+bool cmp(Point a, Point b) {
+	double now = check(s[1], a, s[1], b);//这里顺序不要错了！！ 
+	//通过叉乘来替代极角，避免浮点误差 
+	if(now > 0) return true;
+	else if(now < 0) return false;
+	//如果共线 
+	return calc_Len(s[1], a) < calc_Len(s[1], b);//近的排前面 
+}
+void Printf(double x, int L) {
+	cout << fixed << setprecision(L) << x << endl;
+}
+signed main(){
+	n = read();	
+	int new_n = 0, num = 0;
+	double Minx = 1e18, Miny = 1e18;//这里记得根据实际情况调整！！！！！
+	for(int i = 1; i <= n; i++) {
+		double x, y;
+		cin >> x >> y;
+		
+		//将(x,y)压入s 
+		s[++new_n].x = x;
+		s[new_n].y = y;
+		if(new_n >= 2) {//令s[1]为基准点，找到符合条件基准点 
+			if(s[new_n].y < s[1].y) {
+				swap(s[new_n], s[1]);
+			}
+			else if(s[new_n].y == s[1].y) {
+				if(s[new_n].x < s[1].x) {
+					swap(s[new_n], s[1]);
+				}
+			}
+		}
+	}
+	n = new_n;
+	sort(s + 2, s + n + 1, cmp);//按照极角排序
+	//从第二个开始，第一个是基准点 
+	
+	s[0].x = s[1].x - 1;//保证不同 
+	for(int i = 1; i <= n; i++) {//依次入栈 
+		if(s[i].x == s[i - 1].x && s[i].y == s[i - 1].y) 
+			continue;//去重 
+		while(num >= 2) {
+			if(check(st[num - 1], st[num], st[num], s[i]) <= 0) {
+				num--;
+				//这里check顺序不要写错了！！！！！ 
+			} 
+			else break;
+		}
+		st[++num] = s[i];
+	}
+	st[++num] = s[1];//最后一个和第一个相同，形成循环 
+	double C = 0, S = 0;//周长 和 面积 
+	for(int i = 1; i < num; i++) {
+		C += calc_Len(st[i], st[i + 1]);//计算凸包周长
+		S += calc_S(st[i], st[i + 1]);
+	}
+	Printf(C, 2);//四舍五入两位输出 
+	cout << endl;
+	printf("%.2lf\n", S);//保留两位输出
+	return 0;
+}
+//月雩·薇嫭 
+```
+
+### 凸包进阶-凸包数量
+
+给定位于**第一象限**的 $n$ 个点，保证无三点共线，求有多少个点集中的点能构成凸多边形（无凹边）？
+
+代码有点长有点复杂
+
+$dp_{i,j}$ 表示以 $j$ 为最后一个点，$i$ 为倒数第二个点的情况数
+
+从第 124 行（初始化）那里才是真正开始计算，前面都是预处理，是固定的步骤
+
+如果有需要更改 $dp$ 的需求，只用关注从 124 行开始
+
+```c++
+#include<bits/stdc++.h>
+#define int long long
+const long long MOD = 998244353;
+const double PI = acos(-1.0);
+
+struct Point {
+    long long x, y;
+};
+
+// 叉积，返回 __int128 避免溢出
+__int128 cross(const Point& a, const Point& b) {
+    return (__int128)a.x * b.y - (__int128)a.y * b.x;
+}
+
+// 用于极角排序的比较器，按相对于 origin 的角度升序
+struct AngleCmp {
+    Point o;
+    AngleCmp(Point _o) : o(_o) {}
+    bool operator()(const Point& a, const Point& b) const {
+        Point va = {a.x - o.x, a.y - o.y};
+        Point vb = {b.x - o.x, b.y - o.y};
+        __int128 cr = cross(va, vb);
+        if (cr != 0) return cr > 0; // 逆时针角度更小
+        // 共线时按距离排序（确保稳定性）
+        long long da = (a.x - o.x) * (a.x - o.x) + (a.y - o.y) * (a.y - o.y);
+        long long db = (b.x - o.x) * (b.x - o.x) + (b.y - o.y) * (b.y - o.y);
+        return da < db;
+    }
+};
+
+void solve() {
+	int n;
+    std::cin >> n;
+    std::vector<Point> pts(n);
+    for (int i = 0; i < n; i++) {
+        std::cin >> pts[i].x >> pts[i].y;
+    }
+
+    // 按 (y, x) 升序，保证唯一最低点
+    std::vector<int> ord(n);
+    iota(ord.begin(), ord.end(), 0);
+    std::sort(ord.begin(), ord.end(), [&](int a, int b) {
+        if (pts[a].y != pts[b].y) return pts[a].y < pts[b].y;
+        return pts[a].x < pts[b].x;
+    });
+
+    // 预计算：每个点 j 按极角排序的其他点，以及每个点的排名
+    std::vector<std::vector<int>> order(n);
+    std::vector<std::vector<int>> rank(n, std::vector<int>(n, -1));
+    std::vector<std::vector<double>> angles(n);
+
+    for (int j = 0; j < n; j++) {
+        std::vector<std::pair<double, int>> tmp;
+        for (int i = 0; i < n; i++) {
+            if (i == j) continue;
+            double ang = atan2((double)(pts[i].y - pts[j].y), (double)(pts[i].x - pts[j].x));
+            if (ang < 0) ang += 2.0 * PI;
+            tmp.push_back({ang, i});
+        }
+        std::sort(tmp.begin(), tmp.end());
+        order[j].resize(n-1);
+        angles[j].resize(n-1);
+        for (int k = 0; k < n-1; k++) {
+            order[j][k] = tmp[k].second;
+            rank[j][tmp[k].second] = k;
+            angles[j][k] = tmp[k].first;
+        }
+    }
+
+    // 预计算每对 (j, k) 的区间端点 [L, R) (在复制后的角度数组中)
+    std::vector<std::vector<int>> L(n, std::vector<int>(n, 0)), R(n, std::vector<int>(n, 0));
+    for (int j = 0; j < n; j++) {
+        int m = n - 1;
+        if (m == 0) continue;
+        std::vector<double> ang2(2 * m);
+        for (int i = 0; i < m; i++) {
+            ang2[i] = angles[j][i];
+            ang2[i + m] = angles[j][i] + 2.0 * PI;
+        }
+        for (int k = 0; k < n; k++) {
+            if (k == j) continue;
+            double theta = atan2((double)(pts[k].y - pts[j].y), (double)(pts[k].x - pts[j].x));
+            if (theta < 0) theta += 2.0 * PI;
+            // 区间 (theta, theta + PI)
+            int l = upper_bound(ang2.begin(), ang2.end(), theta) - ang2.begin();
+            int r = lower_bound(ang2.begin(), ang2.end(), theta + PI) - ang2.begin();
+            L[j][k] = l;
+            R[j][k] = r;
+        }
+    }
+
+    long long ans = 0;
+
+    // 枚举最低点 s
+    for (int sidx = 0; sidx < n; sidx++) {
+        int s = ord[sidx];
+        Point sp = pts[s];
+
+        // 候选点：排在 s 后面的点（y更大，或 y相同但 x更大）
+        std::vector<int> cand;
+        for (int i = sidx + 1; i < n; i++) {
+            int idx = ord[i];
+            if (pts[idx].y > sp.y || (pts[idx].y == sp.y && pts[idx].x > sp.x)) {
+                cand.push_back(idx);
+            }
+        }
+        int m = cand.size();
+        if (m < 2) continue;
+
+        // 按相对于 s 的极角排序候选点
+        sort(cand.begin(), cand.end(), [&](int a, int b) {
+            Point va = {pts[a].x - sp.x, pts[a].y - sp.y};
+            Point vb = {pts[b].x - sp.x, pts[b].y - sp.y};
+            __int128 cr = cross(va, vb);
+            if (cr != 0) return cr > 0;
+            long long da = (pts[a].x - sp.x) * (pts[a].x - sp.x) + (pts[a].y - sp.y) * (pts[a].y - sp.y);
+            long long db = (pts[b].x - sp.x) * (pts[b].x - sp.x) + (pts[b].y - sp.y) * (pts[b].y - sp.y);
+            return da < db;
+        });
+
+        // dp[i][j] 表示以 s 开头，最后两个点是 cand[i], cand[j] 的链数
+        std::vector<std::vector<long long>> dp(m, std::vector<long long>(m, 0));
+
+        // 初始化：三角形 s, i, j
+        for (int i = 0; i < m; i++) {
+            for (int j = i + 1; j < m; j++) {
+                Point vi = {pts[cand[i]].x - sp.x, pts[cand[i]].y - sp.y};
+                Point vj = {pts[cand[j]].x - pts[cand[i]].x, pts[cand[j]].y - pts[cand[i]].y};
+                if (cross(vi, vj) > 0) {
+                    dp[i][j] = 1;
+                }
+            }
+        }
+
+        // DP 转移
+        for (int j = 0; j < m; j++) {
+            int cur = cand[j];
+            // 构建 val 数组：按全局 rank 存储 dp[i][j]
+            int total = n - 1; // 每个点的邻居数量
+            std::vector<long long> val(total, 0);
+            for (int i = 0; i < j; i++) {
+                int pre = cand[i];
+                int rk = rank[cur][pre]; // pre 相对于 cur 的排名
+                val[rk] = (val[rk] + dp[i][j]) % MOD;
+            }
+            // 构建前缀和 (复制一份处理环形)
+            std::vector<long long> pref(2 * total + 1, 0);
+            for (int t = 0; t < total; t++) {
+                pref[t + 1] = (pref[t] + val[t]) % MOD;
+            }
+            for (int t = 0; t < total; t++) {
+                pref[t + total + 1] = (pref[t + total] + val[t]) % MOD;
+            }
+
+            for (int k = j + 1; k < m; k++) {
+                int nxt = cand[k];
+                int l = L[cur][nxt];
+                int r = R[cur][nxt];
+                long long sum = (pref[r] - pref[l] + MOD) % MOD;
+                dp[j][k] = (dp[j][k] + sum) % MOD;
+            }
+        }
+
+        // 累加所有以 s 为最低点的凸多边形
+        for (int i = 0; i < m; i++) {
+            for (int j = i + 1; j < m; j++) {
+                ans = (ans + dp[i][j]) % MOD;
+            }
+        }
+    }
+
+    std::cout << ans << "\n";
+}
+signed main() {
+	int T = 1; 
+	std::cin >> T;
+	while(T--) {
+		solve();
+	}
+	return 0;
+}
+```
+
+
+
+
+
+
+
+
 
 
 
