@@ -802,6 +802,47 @@ signed main() {
 
 最后计算即可
 
+## 16. 滑动窗口
+
+求数组中**每个长度为 `k` 的区间（窗口）的最小值**，最经典且高效的解法是**单调队列（Monotonic Queue）**，通常借助双端队列（`deque`）实现。
+
+核心思想：**维护一个队首到队尾严格递增的索引队列**。队首始终是当前窗口最小值的索引，当新元素比队尾元素小时，弹出队尾（因为新元素更小且“寿命”更长，旧元素永无出头之日）。
+
+### Code
+
+```cpp
+vector<int> minSlidingWindow(vector<int>& nums, int k) {
+    deque<int> dq; //注意，dq存的是索引而非值
+    vector<int> res;
+    for (int i = 0; i < nums.size(); i++) {
+        // 移除过期索引
+        if (!dq.empty() && dq.front() < i - k + 1) {
+            dq.pop_front();
+        }
+        // 维护单调递增
+        while (!dq.empty() && nums[dq.back()] >= nums[i]) {
+            dq.pop_back();
+        }
+        dq.push_back(i);
+        //把当前队列中所有值小于当前值得全部移除，因为选那些值必定劣于选当前值
+        //队首的一定是当前队列中最小的
+        
+        if (i >= k - 1) {
+            res.push_back(nums[dq.front()]);
+        }
+    }
+    return res;
+}
+```
+
+## 17. $DFS\ \&\ BFS$
+
+$dfs$ 和 $bfs$ 没什么好说的，注意使用的时候别爆栈了就行了
+
+**能用 $bfs$ 就少用 $dfs$**
+
+**然后就是 $bfs$ 入队的时候注意别重复入队（以防爆栈）**
+
 
 
 # 二. $trick$(一些简单的技巧)
@@ -827,6 +868,7 @@ signed main() {
 | 16(★★★★★). 浮点二分的时候，如果浮点数很大，一定要限制二分次数，不然会$TLE$！ |
 | 17(★★★). 函数内定义的时候，一定要初始化($vector$初始化见$stl$) |
 | 18(★★★★★).快速幂中，遇到$0^0$需要额外注意，因为幂$0$可能实际上不为$0$，那应该返回$0$而不是$1$s |
+| 19.能用bfs就用bfs而不是dfs，注意别爆栈了                     |
 
 
 
@@ -2276,10 +2318,11 @@ void build() {
 3. 区间内不同元素个数
 4. 求逆序对
 5. 区间第k小
+6. 区间维护区间修改
 
-**如果需要区间修改，那还是老实的用线段树吧，树状数组优点只有代码简单**
+注意：树状数组的一次查询是查询 $1\to x$​ 的前缀查询
 
-### 3.1 基本结构
+### 3.1 基本结构（单点修改，区间查询）
 
 ```c++
 #include<bits/stdc++.h>
@@ -2409,7 +2452,7 @@ for(int i = 1; i <= n; i++) {
 }
 ```
 
-### 3.4 维护差分序列
+### 3.4 维护差分序列（单点修改，区间查询，用差分思想）
 
 如果真要用区间修改，单点查询
 
@@ -2427,6 +2470,46 @@ for(int i = 1; i <= m; i++) {
 int x = read();
 cout << qeury(x);
 ```
+
+### 3.5 进阶：区间修改区间查询
+
+如果需要区间修改区间查询呢？
+
+假设 $d_i$ 是 $a_i$ 的差分数组 （$d_i=a_i-a_{i-1}$），那么有：
+
+$sum_{1...x}=(x+1)\cdot \sum_{i=1}^x d[i] - \sum_{i=1}^x i * d[i]$​
+
+所以维护两个树状数组即可（两个都是单点修改，区间查询）：
+$tr_{i,0}=d_i$
+$tr_{i,1}=i\cdot d_i$
+
+```c++
+int query(int x, int p) {
+	int ans = 0;
+	while(x) {
+		ans += tr[x][p];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+void add(int x, int y, int p) {
+	while(x <= n) {
+		tr[x][p] += y;
+		x += lowbit(x);
+	}
+}
+void addx(int l, int r, int x) {//分别对两个tr单点修改
+	add(l, x, 0); add(r + 1, -x, 0);
+	add(l, x * l, 1); add(r + 1, -x * (r + 1), 1);
+}
+int queryx(int l, int r) {//区间查询
+	int s1 = (r + 1) * query(r, 0) - query(r, 1);
+	int s2 = l * query(l - 1, 0) - query(l - 1, 1);
+	return s1 - s2;
+}
+```
+
+
 
 ## 4. 树链剖分
 
