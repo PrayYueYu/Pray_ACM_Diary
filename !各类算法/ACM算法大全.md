@@ -586,12 +586,12 @@ $double$​类型：
 #include<bits/stdc++.h>
 double RandDouble(double L, double R) {
    static std::mt19937_64 rng([]{
-       auto seed = chrono::steady_clock::now().time_since_epoch().count();
+       auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
        std::random_device rd;
        seed ^= rd() + 0x9e3779b97f4a7c15ULL + (seed<<6) + (seed>>2);
        return seed;
    }());
-   return uniform_real_distribution<double>(L, R)(rng);
+   return std::uniform_real_distribution<double>(L, R)(rng);
 }
 int main() {
     cout << RandDouble(-12.3, 9.1);
@@ -1425,6 +1425,16 @@ for(int i = 1; i <= n; i++) {
 }
 `````
 
+### 状压优化
+
+如果一次性要选多个，那么有一种很好的优化方法
+
+假设当前二进制为 $now$，因为无论如何最低位的 $0$ 一定会在某时刻被选上，$$所以不妨固定 $now$ 的时候第一个选择的就选最低位为 $0$ 的位$$
+
+然后剩下的按照顺序来选，可以极大的优化
+
+
+
 
 
 ## 3. 树形$DP$
@@ -1542,6 +1552,8 @@ void solve() {
 
 ## 1. 线段树
 
+!!!为了防止越界，最好开 $8n$！！！
+
 ### 1.1 基础线段树
 
 #### 1.1.1 引入
@@ -1568,14 +1580,14 @@ void init() {
 不过多赘述
 
 ```c++
-void build(int l, int r, int p) {
+void build(int p, int l, int r) {
     if(l == r) {
-        tr[p] = a[l];
+        tr[p] = 0;
         return;
     }
     int mid = (l + r) >> 1;
-    build(l, mid, p * 2);
-    build(mid + 1, r, p * 2 + 1);
+    build(p * 2, l, mid);
+    build(p * 2 + 1, mid + 1, r);
     tr[p] = max(tr[p * 2], tr[p * 2 + 1]);
     //或者
     tr[p] = tr[p * 2] + tr[p * 2 + 1];
@@ -1589,7 +1601,7 @@ void build(int l, int r, int p) {
 依旧不过多赘述
 
 ```c++
-ll query(int l, int r, int lx, int rx, int p)  {
+int query(int l, int r, int lx, int rx, int p)  {
     //[lx,rx]是查询区间，[l,r]是当前区间
     if(rx < l || r < lx) return; //我更喜欢写在这里，更好想（不在区间直接退出）
     if(lx <= l && r <= rx) { 
@@ -1597,7 +1609,7 @@ ll query(int l, int r, int lx, int rx, int p)  {
         return tr[p];
     }
     int mid = (l + r) >> 1;
-    ll ans = 0;
+    int ans = 0;
     ans += max(ans, ask(l, mid, lx, rx, p * 2));
     ans += max(ans, ask(mid + 1, r, lx, rx, p * 2 + 1));
     //判断是否需要查询这两个区间（是否有交集）
@@ -1627,22 +1639,22 @@ void pushdown(int p, int l, int r) {
 void update(int p, int l, int r, int lx, int rx, int c) {
     //[lx,rx]是修改区间，[l,r]是当前区间，c是改变值
     if(rx < l || r < lx) return;//我更喜欢写在这里
-    pushdown(p, l, r);
     if(lx <= l && r <= rx) {
         Lazy(p, l, r, c);//简化代码
         return;
     }
+    pushdown(p, l, r);
     int mid = (l + r) >> 1;
     update(p * 2, l, mid, lx, rx, c);
     update(p * 2 + 1, mid + 1, r, lx, rx, c);
     tr[p] = tr[p * 2] + tr[p * 2 + 1];
 }
-ll query(int p, int l, int r, int lx, int rx)  {
+int query(int p, int l, int r, int lx, int rx)  {
     if(rx < l || r < lx) return 0;
-    pushdown(p, l, r);
     if(lx <= l && r <= rx) return tr[p];
+    pushdown(p, l, r);
     int mid = (l + r) >> 1;
-    ll ans = 0;
+    int ans = 0;
     ans += query(p * 2, l, mid, lx, rx);
     ans += query(p * 2 + 1, mid + 1, r, lx, rx);
     return ans;
@@ -5210,7 +5222,11 @@ int calc_up(int x, int y) {
 
 起点可以流出无限量的流量，终点最终能得到多少？
 
-最优解为：**$HLPP$预流推进算法，时间复杂度$O(N^2\sqrt{m})$**
+最优解为：**$HLPP$预流推进算法，时间复杂度$O(N^2\sqrt{m})$​**
+
+**注意，如果图是特定构造了源点+左边节点+右边节点+汇点这种结构，并且容量=1，那么最优解是 $Dinic$，时间复杂度是 $O(M \sqrt{N})$​**（因为这是二分图匹配）
+
+不过，只要发现是网络流，那$99\%$概率是能使用 $dinic$ 的做法通过的
 
 #### 1.1.1 使用条件
 
@@ -5333,7 +5349,7 @@ signed main() {
 using namespace std;
 const ll N = 1e4 + 10, M = 998244353, INF = 1e18;
 int num = 1, ne[N], to[N], fi[N], w[N], n, m, vis[N];
-int s, t, ans, f[1010][1010], nowfi[N], h[N];
+int s, t, nowfi[N], h[N];
 ll read() {
 	ll x = 0, f = 1; char ch = getchar();
 	while(ch < '0' || ch > '9') {if(ch == '-') f = -1; ch = getchar();}
@@ -5406,6 +5422,7 @@ signed main() {
 	s = read(), t = read();
 	for(int i = 1; i <= m; i++) {
 		int u = read(), v = read(), val = read();
+        //注意，这是有向边
 		if(!f[u][v]) {//如果有重边，注意记录 
 			add(u, v, val);
 			f[u][v] = num;
@@ -5414,6 +5431,7 @@ signed main() {
 			w[f[u][v] - 1] += val;
 		}
 	}
+    int ans = 0;
 	while(true) {
 		if(BFS()) ans += dfs(s, INF);//update改成dfs
 		else break;
