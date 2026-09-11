@@ -2464,7 +2464,7 @@ for(int i = 1; i <= n; i++) {
 }
 ```
 
-### 3.4 维护差分序列（单点修改，区间查询，用差分思想）
+### 3.4 维护差分序列（单点查询，区间修改，用差分思想）
 
 如果真要用区间修改，单点查询
 
@@ -2476,8 +2476,8 @@ $d_i=a_i-a_{i-1}$，那么区间$[l,r]+k$即为$d_l+k,d_{r+1}-k$（两次单点�
 for(int i = 1; i <= m; i++) {
     int l = 1, r = n, k = read();
     //区间[l,r]+k，即差分序列d[l]+k, d[r+1]-k
-    add(l - 1, -k);
-    add(r, k);
+    add(l, k);
+    add(r + 1, -k);
 }
 int x = read();
 cout << qeury(x);
@@ -2496,7 +2496,7 @@ $tr_{i,0}=d_i$
 $tr_{i,1}=i\cdot d_i$
 
 ```c++
-int query(int x, int p) {
+int queryx(int x, int p) {
 	int ans = 0;
 	while(x) {
 		ans += tr[x][p];
@@ -2504,19 +2504,19 @@ int query(int x, int p) {
 	}
 	return ans;
 }
-void add(int x, int y, int p) {
+void addx(int x, int y, int p) {
 	while(x <= n) {
 		tr[x][p] += y;
 		x += lowbit(x);
 	}
 }
-void addx(int l, int r, int x) {//分别对两个tr单点修改
-	add(l, x, 0); add(r + 1, -x, 0);
-	add(l, x * l, 1); add(r + 1, -x * (r + 1), 1);
+void add(int l, int r, int x) {//分别对两个tr单点修改
+	addx(l, x, 0); addx(r + 1, -x, 0);
+	addx(l, x * l, 1); addx(r + 1, -x * (r + 1), 1);
 }
-int queryx(int l, int r) {//区间查询
-	int s1 = (r + 1) * query(r, 0) - query(r, 1);
-	int s2 = l * query(l - 1, 0) - query(l - 1, 1);
+int query(int l, int r) {//区间查询
+	int s1 = (r + 1) * queryx(r, 0) - queryx(r, 1);
+	int s2 = l * queryx(l - 1, 0) - queryx(l - 1, 1);
 	return s1 - s2;
 }
 ```
@@ -2847,6 +2847,118 @@ for(int i = n; i >= 1; i--) {
     }
     if(!st.empty()) r[i] = st.top();//记得这里改成 r
     st.push(i);
+}
+```
+
+## 8. 树套树
+
+### 8.1 树状数组套树状数组（二维/三维偏序问题）
+
+需要求满足以下条件的最大值：
+
+$x_j\le x_i$ 且 $y_j \le y_i$ 且 $j<i$ 的最大的 $f_j$​
+
+然后每次插入 $(x_i,y_i,f_i)$
+
+```c++
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+
+const int INF = 1e18;   // 如果 dp 可能为负或很大，改成 long long 和 -1e18
+
+struct BIT2D {
+    int n;
+    vector<vector<int>> ys, bit;
+
+    BIT2D(int n = 0) : n(n), ys(n + 1), bit(n + 1) {}
+
+    // 离线建树：xr, yr 是离散化后的坐标，范围 1..n 和 1..m
+    void build(const vector<int>& xr, const vector<int>& yr) {
+        int m = xr.size();
+        for (int i = 0; i < m; ++i) {
+            for (int x = xr[i]; x <= n; x += x & -x) {
+                ys[x].push_back(yr[i]);
+            }
+        }
+        for (int i = 1; i <= n; ++i) {
+            auto& v = ys[i];
+            sort(v.begin(), v.end());
+            v.erase(unique(v.begin(), v.end()), v.end());
+            bit[i].assign(v.size() + 1, -INF);
+        }
+    }
+
+    // 在 (x, y) 位置插入值 val，维护最大值
+    //注意，插入的数一定是要在主代码中x、y、xs和ysAll中出现过的才行，不然会插入无效
+    void add(int x, int y, int val) {
+        for (int i = x; i <= n; i += i & -i) {
+            int p = lower_bound(ys[i].begin(), ys[i].end(), y) - ys[i].begin() + 1;
+            for (int j = p; j < (int)bit[i].size(); j += j & -j) {
+                bit[i][j] = max(bit[i][j], val);
+            }
+        }
+    }
+
+    // 查询 x' <= x 且 y' <= y 的最大值
+    int ask(int x, int y) {
+        int res = -INF;
+        for (int i = x; i > 0; i -= i & -i) {
+            int p = upper_bound(ys[i].begin(), ys[i].end(), y) - ys[i].begin();
+            for (int j = p; j > 0; j -= j & -j) {
+                res = max(res, bit[i][j]);
+            }
+        }
+        return res;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+
+    vector<int> x(n), y(n), dp(n);
+    vector<int> xs, ysAll;
+
+    for (int i = 0; i < n; ++i) {
+        cin >> x[i] >> y[i] >> dp[i];
+        xs.push_back(x[i]);
+        ysAll.push_back(y[i]);
+    }
+
+    // 离散化 x和 y
+    sort(xs.begin(), xs.end());
+    xs.erase(unique(xs.begin(), xs.end()), xs.end());
+    sort(ysAll.begin(), ysAll.end());
+    ysAll.erase(unique(ysAll.begin(), ysAll.end()), ysAll.end());
+    vector<int> xr(n), yr(n);
+    for (int i = 0; i < n; ++i) {
+        xr[i] = lower_bound(xs.begin(), xs.end(), x[i]) - xs.begin() + 1;
+        yr[i] = lower_bound(ysAll.begin(), ysAll.end(), y[i]) - ysAll.begin() + 1;
+    }
+
+    BIT2D bit(xs.size());//初始化
+    bit.build(xr, yr);//一定要记得初始化
+
+    for (int i = 0; i < n; ++i) {
+        // 先查询之前插入的点中满足 xj <= xi, yj <= yi 的最大 dpj
+        int best = bit.ask(xr[i], yr[i]);
+
+        // 如果不存在满足条件的点，best == -INF
+        // 你可以在这里用 best 计算当前 dp，例如：
+        // dp[i] = max(dp[i], best + 1);
+
+        // 再把当前点插入
+        bit.add(xr[i], yr[i], dp[i]);
+        //注意，插入的xr和yr一定是要在x、y、xs和ysAll中出现过的才行，不然会插入无效
+
+        cout << best << '\n';   // 输出查询结果
+    }
+
+    return 0;
 }
 ```
 
