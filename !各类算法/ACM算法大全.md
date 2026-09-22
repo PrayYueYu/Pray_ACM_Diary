@@ -1228,13 +1228,13 @@ s.insert(10);//去重
 auto it = s.find(10);//找到10这个元素的指针地址
 it++;/it--;//10元素前一个元素/后一个元素
 
-//删除：
+//删除：时间复杂度O(logn)
 s.erase(20);//删除20这个元素
 s.erase(it);//同时也能通过指针删除元素
 
 cout << s.size() << endl;//set的大小，时间复杂度O(1)
-for(const auto& a : s) cout << a;//普通循环输出
-for(set<int>::iterator it = s.begin(); it!=s.end(); it++)//迭代器循环
+for(const auto& a : s) cout << a;//普通循环输出，时间复杂度O(n)
+for(set<int>::iterator it = s.begin(); it!=s.end(); it++)//迭代器循环，时间复杂度O(n)
     cout << *it;
 
 it = s.lower_bound(x)/s.upper_bound(x);//set也可以用lower/upper,时间复杂度O(logn)
@@ -3138,15 +3138,15 @@ merge(p, p1, p2);
 > 若未进行高斯消元，那么**必须从高位到低位进行判断**，每次都需要重新XOR再进行下一步
 
 ```c++
-k = read();
+x = read();
 for(int i = 63; i >= 0; i--) {
-    if((k >> i) & 1) {
+    if((x >> i) & 1) {
         if(!p[i]) {
             std::cout << -1 << '\n';
             return;
         }
         ans.push_back(i);//答案
-        k ^= p[i];//重要！！因为没有进行高斯消元，所有都是乱的，只能保证第i个线性基最高位是(1ll<<i)
+        x ^= p[i];//重要！！因为没有进行高斯消元，所有都是乱的，只能保证第i个线性基最高位是(1ll<<i)
     }
 }
 ```
@@ -3490,14 +3490,20 @@ for(int i = 1; i <= n; i++) {
 时间复杂度$O(N)$
 
 ```c++
-for(int i = 2; i <= 1e7; i++) {
-	if(!vis[i]) p[++num] = i;
+int maxn = 10000000;
+for(int i = 2; i <= maxn; i++) {
+	if(!vis[i]) {
+        p[++num] = i;
+        h[i] = i;
+    }
 	for(int j = 1; j <= num; j++) {
-		if(i * p[j] > 1e7) break;
+		if(i * p[j] > maxn) break;
 		vis[i * p[j]] = true;
+        h[i * p[j]] = p[j];
 		if(i % p[j] == 0) break;
 	}
 }
+//h作用：记录x的某一个质因子
 ```
 
 **实际上对于$N<10^8$而言，线性筛和埃氏筛在性能上表现接近，都可以用**
@@ -3514,9 +3520,12 @@ for(int i = 2; i <= N0; i++) {
         for(int j = 2; j <= N0; j++) {
             if(i * j > N0) break;
             vis[i * j] = i;
+            h[i * j] = i;
         }
+        h[i] = i;
     }
 }
+//注意，此处的h[i]是i的最大质因数，和欧拉筛的不一样
 ```
 
 ## 5. 欧拉函数&欧拉降幂
@@ -6047,7 +6056,7 @@ long long solve() {
 
 
 
-## 6. 简单环&最小环
+## 6. 简单环 & 有向图判环 & 最小环
 
 简单环定义：在无向图中的一个环，且环内无环套环
 
@@ -6083,7 +6092,48 @@ while(!q.empty()) {
 }
 ```
 
-时间复杂度$O(n+m)$
+时间复杂度$O(n+m)$​
+
+### 6.2 有向图判环
+
+如果是有向图需要判断有没有环，那需要用到 $dfs$​​ 三色法
+
+因为只用 $dfs$ 的话，比如说 A->B->C, A->C，那可能会误判
+
+颜色为 0 代表没经过，颜色为 1 代表正在遍历从这个点出发的边，颜色为 2 代表已经走完了所有从这个点出发的边
+
+```c++
+bool dfs(int u, int fa) {
+    color[u] = 1;               // 灰色：当前递归栈中
+    pos[u] = top;
+    stk[top++] = u;
+
+    for (int i = fi[u]; i != -1; i = ne[i]) {
+        int v = to[i];
+        if (v == fa) continue;  // 无向图简单图：跳过父节点
+
+        if (color[v] == 0) {            // 白色：继续递归
+            if (dfs(v, u)) return true;
+        } else if (color[v] == 1) {     // 灰色：找到环
+            cycle.clear();
+            for (int j = pos[v]; j < top; ++j) {
+                cycle.push_back(stk[j]);
+            }
+            cycle.push_back(v);         // 闭合环，首尾相同
+            return true;
+        }
+        // color[v] == 2：黑色，已完成，跳过
+    }
+
+    color[u] = 2;               // 黑色：已完成
+    --top;                      // 出栈
+    return false;
+}
+```
+
+
+
+
 
 ### 6.2 最小环求法
 
